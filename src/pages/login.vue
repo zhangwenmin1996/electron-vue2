@@ -68,7 +68,7 @@
 </template>
 
 <script>
-
+// const si = require('systeminformation');
 export default {
   name: "login",
   data() {
@@ -114,15 +114,15 @@ export default {
     // this.getIp();
   },
   methods: {
-    getIp() {
-      this.$fetch({
-          url: 'https://www.ip.cn/api/index?ip&type=0',
-          method: "get",
-        }).then((data) => {
-          console.log(data)
-          this.loginForm.ip = data.ip
-        })
-    },
+    // getIp() {
+    //   this.$fetch({
+    //       url: 'https://www.ip.cn/api/index?ip&type=0',
+    //       method: "get",
+    //     }).then((data) => {
+    //       console.log(data)
+    //       this.loginForm.ip = data.ip
+    //     })
+    // },
    
     getCookie() {
     
@@ -138,6 +138,13 @@ export default {
         domain: window.location.host,
         // rememberMe: rememberMe === undefined ? false : Boolean(rememberMe),
       };
+    //   si.system().then(data => {
+    //     console.log('1111 ', data);
+    //     console.log('Manufacturer: ', data.manufacturer);
+    //     console.log('Model: ', data.model);
+    // }).catch(error => {
+    //     console.error(error);
+    // });
     },
   
     handleLogin() {

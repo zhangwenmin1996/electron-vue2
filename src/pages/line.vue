@@ -227,7 +227,7 @@ export default {
         line_id: val.planArea,
         renameModelType: val.renameModelType,
         taskId: val.id,
-        picRenameModelId: val.picRenameModelId,
+        picRenameModelId: val.picRenameModelId || 1,
         loopName: val.loopName,
         planAreaName: val.planAreaName,
       };

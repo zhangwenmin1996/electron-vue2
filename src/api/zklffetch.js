@@ -7,7 +7,7 @@ import { Message } from 'element-ui'
 // var baseURLStr = configSetting.baseURL2;
 // const BASEURL = process.env.NODE_ENV === "production" ? baseURLStr : '/spf-tast';
 const instance = axios.create({
-    baseURL: '//api2.zklf-tech.com',
+    baseURL: 'http://api2.zklf-tech.com',
     // baseURL: BASEURL,
     // baseURL: baseURLStr,
 

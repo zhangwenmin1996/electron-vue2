@@ -169,7 +169,7 @@ export default {
     //     filename: "/data/dataList.db"
     // })
 
-
+    this.$db.open();
     this.getList()
     // this.getDataList()
 	},
@@ -374,9 +374,7 @@ export default {
       let that = this
       this.currentPage = 1;
       that.loading = true
-      that.faultList = await that.$db.faultList.toArray()
-      that.ruleList = await that.$db.ruleList.toArray()
-      that.imgList = await that.$db.imgList.toArray()
+      
       let data = await that.$db.dataList.toArray()
       data.sort((a, b) => {
             return b.updateTime - a.updateTime ;
@@ -387,6 +385,9 @@ export default {
          that.list = data
          that.total = data.length
       // });
+      that.faultList = await that.$db.faultList.toArray()
+      that.ruleList = await that.$db.ruleList.toArray()
+      that.imgList = await that.$db.imgList.toArray()
         console.log(that.faultList,11)
       
     },

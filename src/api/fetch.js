@@ -5,7 +5,7 @@ import { Message, Notification, MessageBox } from 'element-ui'
 // 添加请求拦截器
 let isLogin = false
 const instance = axios.create({
-    baseURL: '//api1.zklf-tech.com',
+    baseURL: 'http://api1.zklf-tech.com',
     // baseURL: '/api-li',
     // baseURL: 'http://192.168.13.14:8001',
     timeout: 1000 * 60 * 5,
