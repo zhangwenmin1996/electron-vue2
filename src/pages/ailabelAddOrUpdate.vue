@@ -123,7 +123,6 @@
                 id="mapImg2"
                 :src="imgsrcNow"
                 alt=""
-                @load="successLoading"
                 v-show="false"
                 class="loadingImgbigsiagn2"
               />
@@ -846,9 +845,9 @@ export default {
         gMap.destroy();
       }
        that.imgsrcNow = 'file://' + that.imgsrcNowList[that.imgIndex].file_link
-      //  setTimeout(() => {
-      //   that.successLoading()
-      //  }, 20);
+       setTimeout(() => {
+        that.successLoading()
+       }, 150);
       
      
     },
