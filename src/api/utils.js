@@ -143,3 +143,7 @@ export function uploadMinIo(bucket, patheName, dataurl) { // 直接上传文件
         return blob
     }
 }
+
+export function getToken() {
+    return sessionStorage.getItem('token')
+}

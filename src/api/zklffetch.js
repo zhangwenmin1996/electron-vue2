@@ -3,13 +3,13 @@ import Vue from 'vue'
 // import axiosRetry from 'axios-retry';
 import { Message } from 'element-ui'
 
-// import configSetting from '@/configSetting'
-// var baseURLStr = configSetting.baseURL2;
+import configSetting from './configSetting'
+var baseURLStr = configSetting.baseURL2;
 // const BASEURL = process.env.NODE_ENV === "production" ? baseURLStr : '/spf-tast';
 const instance = axios.create({
-    baseURL: 'http://api2.zklf-tech.com',
+    // baseURL: 'http://api2.zklf-tech.com',
     // baseURL: BASEURL,
-    // baseURL: baseURLStr,
+    baseURL: `http:${baseURLStr}`,
 
     timeout: 1000 * 60 * 5,
     // withCredentials: true,

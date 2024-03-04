@@ -1,11 +1,15 @@
 import axios from 'axios'
 import Vue from 'vue'
 import router from '@/router'
+import { getToken } from './utils'
 import { Message, Notification, MessageBox } from 'element-ui'
 // 添加请求拦截器
 let isLogin = false
+import configSetting from './configSetting'
+var baseURLStr = configSetting.baseURL;
 const instance = axios.create({
-    baseURL: 'http://api1.zklf-tech.com',
+    // baseURL: 'http://api1.zklf-tech.com',
+    baseURL: `http:${baseURLStr}`,
     // baseURL: '/api-li',
     // baseURL: 'http://192.168.13.14:8001',
     timeout: 1000 * 60 * 5,
@@ -17,10 +21,10 @@ const instance = axios.create({
 instance.interceptors.request.use(
     config => {
         // ADD 添加从Url获取token
-        let token = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb21wYW55Q29kZSI6IjAiLCJ1c2VyX25hbWUiOiJ6a2xmLWdsLWFkbWluIiwiY3JlZGVudGlhbHNOb25FeHBpcmVkIjp0cnVlLCJpc1RyaWFsIjpudWxsLCJhdXRob3JpdGllcyI6W3siYXV0aG9yaXR5IjoiQURNSU4ifV0sInVzZXJDb2RlIjoiOTk5IiwiZW5hYmxlZCI6dHJ1ZSwiY2xpZW50X2lkIjoiY2xpZW50LWFwcCIsInBhc3N3b3JkIjoiJDJhJDEwJEx4eG1hYWRWam9KNlZQSk8vVE1EdHVvWnpLc3Jsb2pETW4yNEJvTi91TkR2LkpVYUU3SnVtIiwicGhvbmUiOiIxMTA4OCIsImV4cGlyYXRpb25UaW1lIjpudWxsLCJzY29wZSI6WyJhbGwiXSwiZG9tYWluIjpudWxsLCJhY2NvdW50Tm9uRXhwaXJlZCI6dHJ1ZSwiaWQiOjIwLCJ1c2VyVHlwZSI6OTk5OTksImV4cCI6MTcwOTA5ODU2NywianRpIjoiNTExMDUzZDQtYzk0Yy00OWY3LTlmMGMtMzM2MjUyNzI4YmJhIiwidXNlcm5hbWUiOiJ6a2xmLWdsLWFkbWluIiwiYWNjb3VudE5vbkxvY2tlZCI6dHJ1ZX0.XroyPPsvt4IzoGse5n_4hCivsymULCW2_0nvFLy8Yo77lNB-3mwUeJDAYAGvbBcMk6H-_UgsuTfzwXh_8GcqHuXsAthCLigHYYDqkK4oaj9vXz41czjNCFQmXt37F60TAEtEQHUqcEpKAYly5OePn91zc8rvHk0CzUp4TsTkLvQ';
-
-        if (token) {
-            config.headers['Authorization'] = 'Bearer ' + sessionStorage.getItem('token') || token;
+        let token = '';
+        const isToken = (config.headers || {}).isToken === false
+        if (getToken() && !isToken) {
+            config.headers['Authorization'] = 'Bearer ' + getToken() || sessionStorage.getItem('token');
         }
 
         if (config.method === 'get' && config.params) {
@@ -103,24 +107,24 @@ instance.interceptors.response.use(
             }).then(() => {
                 // Cookies.remove("username");
                 // Cookies.remove("token");
-                router.push('/login')
+                router.push('/')
                 isLogin = false
                     // location.href = '/login';
             }).catch(() => {
                 isLogin = false
-                message({
-                    type: 'info',
-                    message: '已取消'
-                });
+                    // Message({
+                    //     type: 'info',
+                    //     message: '已取消'
+                    // });
             });
             // return Promise.reject(JSON.stringify(data));
         } else {
-            // Message({
-            //     message: message,
-            //     type: 'error',
-            //     duration: 3 * 1000
-            // })
-            // return Promise.reject(error);
+            Message({
+                message: message,
+                type: 'error',
+                duration: 3 * 1000
+            })
+            return Promise.reject(error);
         }
 
 

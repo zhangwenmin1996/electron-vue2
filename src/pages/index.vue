@@ -6,6 +6,12 @@
           <el-form-item label="关键字" prop="name" >
             <el-input v-model="queryParams.name" placeholder="请输入关键字" size="small" clearable  @keyup.enter.native="search"></el-input>
           </el-form-item>
+          <el-form-item >
+              <el-button type="primary" icon="el-icon-search" size="small" @click="search">搜索</el-button>
+              <el-button type="primary" icon="el-icon-refresh" size="small" @click="resetQuery">重置</el-button>
+              <el-button type="primary" icon="el-icon-refresh" size="small" @click="logOut">退出登录</el-button>
+
+          </el-form-item>
           <!-- <el-form-item label="场景类型" prop="status">
               <el-select popper-class="select-box" v-model="queryParams.scene_code" placeholder="场景类型" @change="getList" clearable size="small">
               <el-option
@@ -17,8 +23,7 @@
             </el-select>
           </el-form-item> -->
           <div style="float: right">
-              <el-button type="primary" icon="el-icon-search" size="small" @click="search">搜索</el-button>
-              <el-button type="primary" icon="el-icon-refresh" size="small" @click="resetQuery">重置</el-button>
+              
               <el-button type="primary" icon="el-icon-refresh" size="small" @click="syncData">拉取数据</el-button>
               <el-button type="primary" icon="el-icon-refresh" size="small" @click="syncTaskData">同步列表</el-button>
               <el-button type="primary" icon="el-icon-refresh" size="small" @click="syncLineData">同步故障</el-button>
@@ -395,6 +400,10 @@ export default {
       this.currentPage = 1;
       this.getList();
     },
+    logOut(){
+      sessionStorage.clear()
+      this.$router.push("/")
+    },
     handleSizeChange(val) {
       console.log(`每页 ${val} 条`);
       this.currentPage = 1;
@@ -418,7 +427,7 @@ export default {
         page: 1,
         page_size: 10
       },
-
+       window.location.reload();
       this.getList();
     },
     handleUpload(row, index) {

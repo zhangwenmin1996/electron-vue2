@@ -3,6 +3,7 @@
     <el-dialog
       :title="title"
       :visible.sync="visible"
+      v-if="visible"
       :fullscreen="true"
       @ok="handleOk"
       :before-close="handleCancel"
@@ -705,7 +706,7 @@ export default {
     },
     async getImages(id,list) {
       let that = this;
-      let imgList = await that.$db.imgList.toArray()
+      let imgList = await that.$db.imgList.where('taskPlanCode').startsWithIgnoreCase(id).toArray()
             let arr = []
              arr = imgList.map((item) => {
               //  let nameArr = item.split("/")
@@ -756,7 +757,7 @@ export default {
    async getData(id,name) {
       let that = this;
        
-            let arr = await that.$db.markList.toArray()
+            let arr = await that.$db.markList.where('task_id').startsWithIgnoreCase(id).toArray()
             
             arr.forEach((item) => {
                let src = item.show_name
@@ -776,7 +777,7 @@ export default {
             //   };
             // });
             that.imgsrcNowList = arr
-           that.getImages(name,arr);
+           that.getImages(id,arr);
             // console.log(that.imgsrcNowList,31232)
             // that.imgIndex = 0;
             // that.changeImage(that.imgsrcNowList[0], that.imgIndex);
@@ -3211,6 +3212,10 @@ list-style-type: none !important;
 }
 .cjhx-box2 .ant-list-item-action{
   margin-left: 30px !important;
+}
+.cjhx-box2 .ant-spin-nested-loading{
+  display: flex;
+  justify-content: center;
 }
 @media screen and (max-width: 1366px) {
   /*当屏幕尺寸小于1366px时，应用下面的CSS样式*/
