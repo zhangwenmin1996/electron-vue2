@@ -166,7 +166,8 @@ export default {
 
       console.log('硬盘序列号：', diskSerials);
       console.log('CPU序列号：', cpuSerial)
-      let sn = cpuSerial+'@'+diskSerials[0]
+      // let sn = cpuSerial+'@'+diskSerials[0]
+      let sn = cpuSerial
       
     // console.log(os.platform()); // 获取操作系统平台，如win32、linux、darwin等
     // console.log(os.arch()); // 获取CPU架构，如x64、ia32等

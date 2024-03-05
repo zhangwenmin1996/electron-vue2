@@ -511,7 +511,9 @@ export default {
       let picIndex = parseInt(arr[arr.length - 2]) 
       let ruleObj = that.ruleList.filter(obj => obj.id == form.picRenameModelId);
       let renameList = ruleObj[0].picRenameBasicList
-      let showName =`${form.loopName}-${form.planAreaName}-${renameList.filter(row => row.picIndex == picIndex)[0].picName}`
+      let picName = renameList.filter(row => row.picIndex == picIndex)
+      console.log(picName,11111)
+      let showName =`${form.loopName}-${form.planAreaName}-${picName.length!=0?picName[0].picName:picIndex}`
       console.log(showName,999999)
      // renameList.forEach(item => {
       //   if(picIndex==item.picIndex){
