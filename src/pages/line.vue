@@ -207,7 +207,8 @@ export default {
       checkedCities: [],
       url: '',
       dialogVisible: false,
-      ruleList: []
+      ruleList: [],
+      imgPath: null,
     };
   },
   components: {},
@@ -236,9 +237,12 @@ export default {
       this.checkedCities = []
       this.visible = true;
       this.getSeafile();
-      if (!fs.existsSync('D:/imgPath')) {
-        fs.mkdirSync('D:/imgPath');
-      }
+      let imgDir = localStorage.getItem('imgPath')
+      console.log('应用路径3:', imgDir);
+      this.imgPath = imgDir
+      // if (!fs.existsSync('D:/imgPath')) {
+      //   fs.mkdirSync('D:/imgPath');
+      // }
     },
      refresh(val){
       this.isName = val.name
@@ -529,7 +533,7 @@ export default {
         isSync: 0,
         picIndex: picIndex,
       }
-      let targetPath = `D:/imgPath/${form.line_task_id}`;
+      let targetPath = `${that.imgPath}/${form.line_task_id}`;
       // let reader = new FileReader();
       // reader.readAsDataURL(file.file);
       // reader.onload = (e) => {

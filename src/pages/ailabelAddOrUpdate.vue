@@ -250,6 +250,7 @@
  
 <script>
 import Vue from "vue";
+const path = require('path');
 // import GlobalBox from "./global";
 // import { myMixin } from "./defect";
 // import { getImage } from "@/utils/upload";
@@ -544,6 +545,9 @@ export default {
       this.form.fjposition = this.faultArray.filter((item) => {
         return item.value === this.form.fault_type;
       })[0].category_fault;
+      this.form.category_name = this.fjpositionList.filter((item) => {
+        return item.code == this.form.fjposition;
+      })[0].name
       this.form.handling_suggestions = this.faultArray.filter((item) => {
         return item.value === this.form.fault_type;
       })[0].handling_suggestions;
@@ -556,6 +560,7 @@ export default {
       let index = this.arrIndex;
       this.formArr[index].fault_type = this.form.fault_type;
       this.formArr[index].fjposition = this.form.fjposition;
+      this.formArr[index].category_name = this.form.category_name;
       this.formArr[index].handling_suggestions =
         this.form.handling_suggestions != ""
           ? this.form.handling_suggestions
@@ -1851,6 +1856,8 @@ export default {
     },
     // 故障信息
     updateErrorInfo(val,subForm) {
+      let imgDir = localStorage.getItem('imgPath')
+      console.log('应用路径3:', imgDir);
       console.log(this.originForm, this.isnext);
       let data = val
       data.file_link = this.originForm.minio_link
@@ -1862,8 +1869,10 @@ export default {
       this.$db.markList.put(data);
       let obj = {
         fileName: this.originForm.file_name,
+        targetPath:  `${imgDir}/${this.originForm.task_id}/${this.originForm.file_name}`,
         zoneId: this.originForm.zone_id,
         taskId: this.originForm.task_id,
+        planAreaName: this.wtgName,
         stationId:this.originForm.station_id,
         faultList: val.fault_list,
         isSync: 0,
@@ -1941,11 +1950,23 @@ export default {
         }
         element.fault_info = that.faultArray.filter((item) => {
           return item.value === element.fault_type;
+        })[0].fault_info;
+        element.fault_type_name = that.faultArray.filter((item) => {
+          return item.value === element.fault_type;
         })[0].fault_type;
         element.fault_level = that.faultArray.filter((item) => {
           return item.value === element.fault_type;
         })[0].fault_level;
-        element.fault_info = element.fjposition;
+        element.fjposition = that.faultArray.filter((item) => {
+          return item.value === element.fault_type;
+        })[0].category_fault;
+        element.category_name = that.fjpositionList.filter((item) => {
+          return item.code == element.fjposition;
+        })[0].name
+       
+        element.category_fault = that.faultArray.filter((item) => {
+          return item.value === element.fault_type;
+        })[0].category_fault;
         // element.trail = this.setSizeMask(element.maskPoints, {
         //   width: imgWidth,
         //   height: imgHeight,
@@ -1983,11 +2004,15 @@ export default {
             release_status: 1,
             zone_id: this.wtg_id,
             station_id: this.wtg_plant_id,
+             planAreaName: this.wtgName,
             // wtg_task_image_id: this.originForm.wtg_task_image_id,
             task_id: this.originForm.task_id,
             fault_type_code: element.fault_type,
+            fault_type_name: element.fault_type_name,
             fault_info: element.fault_info,
             fault_level: element.fault_level,
+            category_fault: element.category_fault,
+            category_name: element.category_name,
             handling_suggestions: element.handling_suggestions,
             fault_location: [
               Math.round(element["points"].x) ,
@@ -2022,12 +2047,15 @@ export default {
             wtg_plant_id: this.originForm.wtg_plant_id,
             release_status: 1,
             zone_id: this.wtg_id,
+            planAreaName: this.wtgName,
             station_id: this.wtg_plant_id,
             // wtg_task_image_id: this.originForm.wtg_task_image_id,
             task_id: this.originForm.task_id,
             fault_type_code: element.fault_type,
             fault_info: element.fault_info,
             fault_level: element.fault_level,
+            category_fault: element.category_fault,
+            category_name: element.category_name,
             handling_suggestions: element.handling_suggestions,
             important: 1,
             fault_location: [
@@ -2168,6 +2196,9 @@ export default {
           element.fjposition = this.faultArray.filter((item) => {
             return item.value === element.fault_type;
           })[0].category_fault;
+          element.category_name = that.fjpositionList.filter((item) => {
+          return item.code == element.fjposition;
+        })[0].name
           // important
           // element.important = this.faultArray.filter((item) => {
           //   return item.value === element.fault_type;
@@ -2639,6 +2670,7 @@ export default {
           element.labelId = this.form.labelId;
           element.fault_type = this.form.fault_type;
           element.fault_info = this.form.fault_info;
+          element.category_name = this.form.category_name;
           element.fault_level = this.form.fault_level;
           element.errorNum = this.formArr.length;
           element.imageId = this.imageId;

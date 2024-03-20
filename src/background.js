@@ -71,6 +71,16 @@ app.on('ready', async() => {
     }
     createWindow()
 })
+app.whenReady().then(() => {
+    // 获取当前应用的根目录路径
+    const appPath = app.getAppPath();
+
+    // 监听渲染进程发来的消息
+    ipcMain.on('get-app-path', (event) => {
+        // 将根目录路径发送给渲染进程
+        event.reply('app-path', appPath);
+    });
+});
 ipcMain.on('copy-image', (event, filePath, targetFolderPath) => {
     const targetPath = path.join(targetFolderPath, path.basename(filePath));
 
