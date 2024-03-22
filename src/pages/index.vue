@@ -355,8 +355,8 @@ export default {
       }
       const exePath = '../../public/main.exe';
       const docxPath = '../../public/template_line_m30t.docx';
-     const publicExePath = process.env.NODE_ENV== 'development'? "E:/web/electron-vue2/dist/main.exe":  path.join(__dirname, exePath);
-     const publicDocxPath =process.env.NODE_ENV== 'development'? "E:/web/electron-vue2/dist/template_line_m30t.docx": path.join(__dirname, docxPath);
+     const publicExePath = process.env.NODE_ENV== 'development'? "E:/web/electron-vue2/public/main.exe":  path.join(__dirname, exePath);
+     const publicDocxPath =process.env.NODE_ENV== 'development'? "E:/web/electron-vue2/public/template_line_m30t.docx": path.join(__dirname, docxPath);
 
       console.log('文件夹:',process.env.NODE_ENV,publicExePath,publicDocxPath);
      setTimeout(() => {
