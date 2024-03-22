@@ -10,7 +10,7 @@
       <h3 class="title">智能运维系统</h3>
       <div class="dot"></div>
     </div>
-    <div class="left"></div>
+    <!-- <div class="left"></div> -->
     <el-form
       ref="loginForm"
       :model="loginForm"
@@ -178,7 +178,7 @@ export default {
       let that = this
       that.sn = sn
       that.$fetch({
-          url: "api/inspection/inspection/manageAuthorizationController/selectBySn",
+          url: "http://api1.zklf-tech.com/api/inspection/inspection/manageAuthorizationController/selectBySn",
           method: "post",
           params: {
             deviceSn: sn,
@@ -231,7 +231,7 @@ export default {
     activation(value,sn){
       let that = this
       that.$fetch({
-        url: "api/inspection/inspection/manageAuthorizationController/activation",
+        url: "http://api1.zklf-tech.com/api/inspection/inspection/manageAuthorizationController/activation",
         method: "post",
         data: {
           deviceSn: sn,
@@ -370,7 +370,7 @@ export default {
 .box{
   width: 100vw;
   height: 100vh;
-  background: url("../assets/login/bg1.png") center ;
+  background: url("../assets/login/bg4.png") center ;
   background-size: 100%;
   overflow: hidden;
   #particles-js {

@@ -504,8 +504,9 @@ export default {
        
  
     seePicture(item){
-      console.log(item,111)
+     
         this.url = 'file://' + item.imgUrl
+         console.log(item,this.url,111)
         this.dialogVisible = true
     },
     setFolder(form, file) {

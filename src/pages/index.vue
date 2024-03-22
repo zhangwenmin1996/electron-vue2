@@ -158,7 +158,7 @@
           label="巡检类型"
           min-width="100"
         ></el-table-column>
-        <el-table-column align="center" label="操作" width="200">
+        <el-table-column align="center" label="操作" width="240">
         <template slot-scope="scope">
           <el-button
            type="text" size='medium'
@@ -167,8 +167,15 @@
           >
           <el-button
            type="text" size='medium'
+           :loading="scope.row.btnLoading"
             @click="report(scope.row)"
-            >生成报告</el-button>
+            >{{scope.row.docxUrl?'重新生成':'生成报告'}}</el-button>
+          <el-button
+           type="text" size='medium'
+           v-if="scope.row.docxUrl"
+            @click="reportSee(scope.row)"
+            >查看报告</el-button
+          >
         </template>
       </el-table-column>
       </el-table>
@@ -257,6 +264,7 @@ export default {
       },
       jsonDir: null,
       imgDir: null,
+      docxList: null,
     };
   },
   created() {
@@ -306,6 +314,7 @@ export default {
     },
     async report(row){
       let that = this
+      that.$set(row,'btnLoading',true)
       let list = await this.$db.dataList.where('planCode').startsWithIgnoreCase(row.planCode).toArray()
       let arr = []
       const data = {
@@ -344,7 +353,12 @@ export default {
        
         });
       }
-     
+      const exePath = '../../public/main.exe';
+      const docxPath = '../../public/template_line_m30t.docx';
+     const publicExePath = process.env.NODE_ENV== 'development'? "E:/web/electron-vue2/dist/main.exe":  path.join(__dirname, exePath);
+     const publicDocxPath =process.env.NODE_ENV== 'development'? "E:/web/electron-vue2/dist/template_line_m30t.docx": path.join(__dirname, docxPath);
+
+      console.log('文件夹:',process.env.NODE_ENV,publicExePath,publicDocxPath);
      setTimeout(() => {
         data.taskList = arr
         const jsonData = JSON.stringify(data, null, 2);
@@ -359,18 +373,62 @@ export default {
       fs.writeFileSync(filePath, jsonData);
       console.log('JSON 文件已保存到:', filePath);
       console.log(data,3333)
-      // const cmd = 'ipconfig';
-      // exec(cmd, (error, stdout, stderr) => {
-      //   if (error) {
-      //     console.error('执行命令出错:', error);
-      //     return;
-      //   }
-      //   console.log('命令输出:', stdout);
-      // });
+      const exeUrl = publicExePath
+      const docxUrl = publicDocxPath
+      const docxPathUrl = path.join(that.docxList, `${data.simpleName}${data.loopName}无人机输电线路巡检报告_${that.parseTime(new Date().getTime(),'{y}{m}{d}{h}{i}{s}')}.docx`);
+      // const docxPathUrl = path.join(that.docxList, `${data.simpleName}${data.loopName}无人机输电线路巡检报告.docx`);
+      // const cmd = `E:\\web\\electron-vue2\\dist\\main.exe ${filePath} E:\\docxList E:\\web\\electron-vue2\\dist\\template_line_m30t.docx`;
+      const cmd = `${exeUrl} ${filePath} ${docxPathUrl} ${docxUrl}`;
+      console.log(cmd,333)
+      that.$message.success('报告正在生成，请稍等...')
+      exec(cmd, (error, stdout, stderr) => {
+        if (error) {
+          console.error('执行命令出错:', error);
+          that.$set(row,'btnLoading',false)
+          that.$alert(`报告生成出错:${error}`)
+          return;
+        }else{
+          let id = row.planCode
+          that.$db.planList.update(id,{docxUrl: docxPathUrl})
+          that.$set(row,'btnLoading',false)
+            that.$alert(`报告本地路径: ${docxPathUrl}`, '报告生成成功，是否直接打开？', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).then(() => {
+              let openCmd = `start ${docxPathUrl}`
+             exec(openCmd, (error, stdout, stderr) => {
+
+             })
+            }).catch(() => {
+                     
+            });
+            // that.$message.success('报告生成成功！')
+           
+        }
+        
+        console.log('命令输出:', stdout);
+      });
      }, 1000);
       // 指定保存的文件夹路径
      
       
+    },
+    reportSee(row){
+      let that = this
+      let openCmd = `start ${row.docxUrl}`
+      that.$alert(`报告本地路径: ${row.docxUrl}`, '报告已生成，是否直接打开？', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        exec(openCmd, (error, stdout, stderr) => {
+
+        })
+      }).catch(() => {
+               
+      });
+     
     },
     refreshStatus(row){
       let that = this
@@ -627,6 +685,7 @@ export default {
         // 在这里你可以使用appPath变量，例如创建子文件夹
         const imgDir = path.join(diskLocation, 'imgPath');
         const jsonDir = path.join(diskLocation, 'json');
+        const docxDir = path.join(diskLocation, 'docxList');
 
         // 检查并创建子文件夹
         if (!fs.existsSync(imgDir)) {
@@ -635,12 +694,17 @@ export default {
         if (!fs.existsSync(jsonDir)) {
           fs.mkdirSync(jsonDir);
         }
+        if (!fs.existsSync(docxDir)) {
+          fs.mkdirSync(docxDir);
+        }
         const imgPath = imgDir.replace(/\\/g, '/');
         localStorage.setItem('imgPath',imgPath)
         that.imgDir = imgPath
         const jsonPath = jsonDir.replace(/\\/g, '/');
         that.jsonDir = jsonPath
-        console.log('应用路径2:', jsonPath,imgPath);
+      
+        that.docxList = docxDir
+        console.log('应用路径2:', jsonPath,imgPath,docxDir);
       });
       
       this.currentPage = 1;
