@@ -391,6 +391,7 @@ export default {
           let id = row.planCode
           that.$db.planList.update(id,{docxUrl: docxPathUrl})
           that.$set(row,'btnLoading',false)
+          that.$set(row,'docxUrl',docxPathUrl)
             that.$alert(`报告本地路径: ${docxPathUrl}`, '报告生成成功，是否直接打开？', {
               confirmButtonText: '确定',
               cancelButtonText: '取消',

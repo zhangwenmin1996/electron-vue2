@@ -413,7 +413,12 @@ export default {
     // },
   },
   //生命周期 - 创建完成（可以访问当前this实例）
-  created() {},
+  created() {
+    document.addEventListener("keydown", this.keyDown);
+  },
+  beforeDestroy(){
+    document.removeEventListener("keydown", this.keyDown);
+  },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {
     let that = this;
@@ -434,6 +439,15 @@ export default {
   activated() {}, //如果页面有keep-alive缓存功能，这个函数会触发
   //方法集合
   methods: {
+    keyDown(event){
+      let that = this
+      let key = window.event.keyCode;
+      if(key==39||key==40){
+        that.updateText('next')
+      }else if(key==37||key==38){
+        that.updateText('prev')
+      }
+    },
     async getDict() { // 修改  formdata传值方式
      let data = await this.$db.lineList.toArray()
       this.fjpositionList = data
@@ -1890,6 +1904,8 @@ export default {
       //     // this.getData(this.taskId)
           if (this.isnext === "next") {
             this.nextImg();
+          }else if(this.isnext === "prev"){
+            this.prevImg();
           }
       //   } else {
       //   }
@@ -2488,6 +2504,17 @@ export default {
         this.changeImage(this.imgsrcNowList[this.imgIndex], this.imgIndex);
       } else {
         this.imgIndex++;
+        this.changeImage(this.imgsrcNowList[this.imgIndex], this.imgIndex);
+      }
+    },
+    prevImg(){
+       if (this.imgIndex == 0) {
+        this.$message.success("已经是第一张了");
+        this.spinning = false;
+        this.imgIndex = 0;
+        this.changeImage(this.imgsrcNowList[this.imgIndex], this.imgIndex);
+      } else {
+        this.imgIndex--;
         this.changeImage(this.imgsrcNowList[this.imgIndex], this.imgIndex);
       }
     },
