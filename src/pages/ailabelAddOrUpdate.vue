@@ -189,7 +189,15 @@
                             </el-form-item> -->
              
               <el-form-item label="故障等级" :label-width="formLabelWidth">
-                <el-input v-model="form.fault_level" size="small" readonly />
+                <!-- <el-input v-model="form.fault_level" size="small"  /> -->
+                <el-select v-model="form.fault_level">
+                  <el-option
+                    v-for="(item, index) in ['一般','重要','危急']"
+                    :key="index"
+                    :label="item"
+                    :value="item"
+                  ></el-option>
+                </el-select>
               </el-form-item>
               <el-form-item label="处理建议" :label-width="formLabelWidth">
                 <el-input
@@ -197,7 +205,7 @@
                   type="textarea"
                   :rows="2"
                   size="small"
-                  readonly
+                  
                 />
               </el-form-item>
               <el-form-item label="故障数量" :label-width="formLabelWidth">
@@ -3152,7 +3160,6 @@ export default {
   overflow: hidden;
   .content-row {
     min-width: 260px;
-    max-width: 450px;
     display: flex;
     flex-direction: column;
     border: 1px #ccc solid;

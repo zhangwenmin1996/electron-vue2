@@ -4,14 +4,47 @@
     <div class="cont-table">
       <el-form :model="queryParams" ref="queryForm" :inline="true" >
           <el-form-item label="关键字" prop="name" >
-            <el-input v-model="queryParams.name" placeholder="请输入关键字" size="small" clearable  @keyup.enter.native="search"></el-input>
+            <el-input v-model="queryParams.name" placeholder="请输入计划或电站名称" size="small" clearable  @keyup.enter.native="search"></el-input>
+          </el-form-item>
+          <el-form-item label="任务时间">
+            <el-date-picker
+              v-model="startTime"
+              type="datetimerange"
+              :picker-options="pickerOptions"
+              range-separator="至"
+              start-placeholder="开始时间"
+              end-placeholder="结束时间"
+              align="right"
+              value-format="yyyy-MM-dd HH:mm:ss"
+              size="small"
+              @change="changeTime"
+            >
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item label="计划状态">
+            <el-select
+              popper-class="select-box"
+              v-model="queryParams.planStatusName"
+              placeholder="请选择计划状态"
+              clearable
+              filterable
+              size="small"
+              @change="changePlanStatus"
+            >
+              <el-option
+                v-for="(item, index) in ['全部','执行中','已完成']"
+                :key="index"
+                :label="item"
+                :value="item"
+              />
+            </el-select>
           </el-form-item>
           <el-form-item >
               <el-button type="primary" icon="el-icon-search" size="small" @click="search">搜索</el-button>
               <el-button type="primary" icon="el-icon-refresh" size="small" @click="resetQuery">重置</el-button>
               <el-button type="primary" icon="el-icon-refresh" size="small" @click="logOut">退出登录</el-button>
-
-          </el-form-item>
+            </el-form-item>
+        
           <!-- <el-form-item label="场景类型" prop="status">
               <el-select popper-class="select-box" v-model="queryParams.scene_code" placeholder="场景类型" @change="getList" clearable size="small">
               <el-option
@@ -22,14 +55,15 @@
               />
             </el-select>
           </el-form-item> -->
-          <div style="float: right">
+           <br/>
+          <el-form-item >
               
               <el-button type="primary" icon="el-icon-refresh" size="small" @click="syncData">拉取数据</el-button>
               <el-button type="primary" icon="el-icon-refresh" size="small" @click="delData">清空数据</el-button>
               <el-button type="primary" icon="el-icon-refresh" size="small" @click="syncTaskData">同步列表</el-button>
               <el-button type="primary" icon="el-icon-refresh" size="small" @click="syncLineData">同步故障</el-button>
               <el-button type="primary" icon="el-icon-refresh" size="small" @click="syncImgData">同步图片</el-button>
-          </div>
+            </el-form-item>
         </el-form>
         <div style="margin:0 0 20px 0;border-top: 1px #ccc solid;"></div>
         <!--列表-->
@@ -231,7 +265,9 @@ export default {
       // methodUrl: 'http://192.168.10.45:9020/',
      	queryParams: {
         page: 1,
-        page_size: 10
+        page_size: 10,
+        name: '',
+        planStatusName: '',
       },
       currentPage: 1, // 当前页码
       pageSize: 10, // 每页的数据条数
@@ -265,6 +301,39 @@ export default {
       jsonDir: null,
       imgDir: null,
       docxList: null,
+      allList: [],
+      startTime: null,
+      pickerOptions: {
+        shortcuts: [
+          {
+            text: "最近一个月",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+              picker.$emit("pick", [start, end]);
+            },
+          },
+          {
+            text: "最近三个月",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+              picker.$emit("pick", [start, end]);
+            },
+          },
+          {
+            text: "最近一年",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 365);
+              picker.$emit("pick", [start, end]);
+            },
+          },
+        ],
+      },
     };
   },
   created() {
@@ -457,37 +526,85 @@ export default {
      }
       // this.$db.dataList.update(row.id,{status:1,statusName: '已上传数据'})
     },
+    filterObjectsByKeywordAndTime(array, keyword, planStatus, startTime, endTime) {
+        // 使用 filter 方法筛选数组
+        return array.filter(obj => {
+            let keywordCondition = true; // 默认关键字条件为 true
+            let timeCondition = true;    // 默认时间条件为 true
+            let planStatusList = true
+            // 如果关键字不为空，则检查关键字条件
+            if (keyword) {
+                keywordCondition = obj.planName.toLowerCase().includes(keyword.toLowerCase()) ||
+                obj.baseCodeName.toLowerCase().includes(keyword.toLowerCase()) ||
+                obj.planAreaName.toLowerCase().includes(keyword.toLowerCase());
+            }
+            if (planStatus&&planStatus!='全部') {
+              planStatusList = obj.planStatusName.toLowerCase().includes(planStatus.toLowerCase())
+            }
+
+            // 如果开始时间和结束时间都不为空，则检查时间条件
+            if (startTime && endTime) {
+                timeCondition = obj.startTime >= startTime && obj.endTime <= endTime;
+            }
+
+            // 返回同时满足关键字条件和时间条件的对象
+            return keywordCondition && timeCondition && planStatusList;
+        });
+    },
+
    async search(){
     this.currentPage = 1;
-      if (this.queryParams.name==''||!this.queryParams.name) {
-        this.getList()
-      }else{
-        try {
-        // 使用 Dexie.js 的 where() 方法进行复合查询
-          // this.list = await this.$db.dataList
-          //   .where('taskPlanName')
-          //   .startsWithIgnoreCase(this.queryParams.name)
-          //   .or('baseCodeName')
-          //   .startsWithIgnoreCase(this.queryParams.name)
-          //   .or('simpleName')
-          //   .startsWithIgnoreCase(this.queryParams.name)
-          //   .or('planAreaName')
-          //   .startsWithIgnoreCase(this.queryParams.name)
-          //   .toArray();
-          this.planList = await this.$db.planList
-            .where('planName')
-            .startsWithIgnoreCase(this.queryParams.name)
-            .or('baseCodeName')
-            .startsWithIgnoreCase(this.queryParams.name)
-            .or('planAreaName')
-            .startsWithIgnoreCase(this.queryParams.name)
-            .toArray();
-          this.total = this.list.length
-        } catch (error) {
-          console.error('Error searching for friends by keyword:', error);
-        }
-      }
+      // if (this.queryParams.name==''||!this.queryParams.name) {
+      //   this.getList()
+      // }else{
+        
+        this.planList = this.filterObjectsByKeywordAndTime(this.allList,this.queryParams.name,this.queryParams.planStatusName,this.queryParams.startTime,this.queryParams.endTime)
+        console.log(this.queryParams,this.planList,6663)
+        this.total = this.planList.length
+        // try {
+        // // 使用 Dexie.js 的 where() 方法进行复合查询
+        //   // this.list = await this.$db.dataList
+        //   //   .where('taskPlanName')
+        //   //   .startsWithIgnoreCase(this.queryParams.name)
+        //   //   .or('baseCodeName')
+        //   //   .startsWithIgnoreCase(this.queryParams.name)
+        //   //   .or('simpleName')
+        //   //   .startsWithIgnoreCase(this.queryParams.name)
+        //   //   .or('planAreaName')
+        //   //   .startsWithIgnoreCase(this.queryParams.name)
+        //   //   .toArray();
+          
+        //   // this.planList = await this.$db.planList
+        //   //   .where('planName')
+        //   //   .startsWithIgnoreCase(this.queryParams.name)
+        //   //   .or('baseCodeName')
+        //   //   .startsWithIgnoreCase(this.queryParams.name)
+        //   //   .or('planAreaName')
+        //   //   .startsWithIgnoreCase(this.queryParams.name).toArray()
+            
+        //     console.log(this.planList,336)
+        //   this.total = this.planList.length
+        // } catch (error) {
+        //   console.error('Error searching for friends by keyword:', error);
+        // }
+      // }
       
+    },
+    changeTime(val) {
+      if (val) {
+        this.queryParams.startTime = val[0];
+        this.queryParams.endTime = val[1];
+      } else {
+        this.queryParams.startTime = "";
+        this.queryParams.endTime = "";
+      }
+      this.planList = this.filterObjectsByKeywordAndTime(this.allList,this.queryParams.name,this.queryParams.planStatusName,this.queryParams.startTime,this.queryParams.endTime)
+      this.total = this.planList.length
+    },
+    async changePlanStatus(val){
+      console.log(val,1111)
+        this.planList = this.filterObjectsByKeywordAndTime(this.allList,this.queryParams.name,val,this.queryParams.startTime,this.queryParams.endTime)
+        this.total = this.planList.length
     },
     async getDataList(row){
       let data = await this.$db.dataList.where('planCode').startsWithIgnoreCase(row.planCode).toArray()
@@ -589,9 +706,9 @@ export default {
       let filteredArray = that.faultList.filter(obj => obj.isSync != 1);
       console.log(that.faultList,filteredArray,11)
       that.$fetch({
-      url: 'api/inspection/inspection/lineController/synchronizeData',
-      method: 'post',
-      data: filteredArray,
+        url: 'api/inspection/inspection/lineController/synchronizeData',
+        method: 'post',
+        data: filteredArray,
       }).then((data) => {
         if (data && data.status == 200) {
           filteredArray.forEach(item => {
@@ -718,6 +835,7 @@ export default {
       // that.$dataList.find({}, function (err, data) {
          that.planLoading = false
          console.log(data,2222)
+         that.allList = data
          that.planList = data
          that.total = data.length
       // });
