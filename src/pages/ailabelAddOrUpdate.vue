@@ -190,7 +190,7 @@
              
               <el-form-item label="故障等级" :label-width="formLabelWidth">
                 <!-- <el-input v-model="form.fault_level" size="small"  /> -->
-                <el-select v-model="form.fault_level">
+                <el-select v-model="form.fault_level"  @change="changeSelect">
                   <el-option
                     v-for="(item, index) in ['一般','重要','危急']"
                     :key="index"
@@ -1966,6 +1966,7 @@ export default {
 
       for (let index = 0; index < this.formArr.length; index++) {
         const element = this.formArr[index];
+        console.log(element,index,333)
         // errorNum = errorNum - 0 + (element.errorNum - 0);
         let obj;
         if (!element.fault_type || element.fault_type == "fault") {
@@ -1984,7 +1985,7 @@ export default {
         element.category_name = that.fjpositionList.filter((item) => {
           return item.code == element.fjposition;
         })[0].name
-       
+        element.fault_level = this.formArr[index].fault_level
         element.category_fault = that.faultArray.filter((item) => {
           return item.value === element.fault_type;
         })[0].category_fault;
@@ -2100,6 +2101,7 @@ export default {
       // // 本地数据库添加故障信息
       // // this.setOriginDB();
       // // 接口更新故障信息
+      console.log(subForm,123)
       let data = {
         file_name: this.originForm.file_name,
         task_id: this.originForm.task_id,
@@ -2193,6 +2195,7 @@ export default {
       // let imgHeight =
       //   imgSrc.naturalHeight /
       //   this.originForm.compressed_image_size.split(",")[0];
+      console.log(this.subForm,666)
       for (let index = 0; index < this.subForm.length; index++) {
         const element = this.subForm[index];
         console.log(element.fault_type_code);
