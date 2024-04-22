@@ -576,9 +576,9 @@ export default {
       this.form.fault_info = this.faultArray.filter((item) => {
         return item.value === this.form.fault_type;
       })[0].fault_type;
-      this.form.fault_level = this.faultArray.filter((item) => {
-        return item.value === this.form.fault_type;
-      })[0].fault_level;
+      // this.form.fault_level = this.faultArray.filter((item) => {
+      //   return item.value === this.form.fault_type;
+      // })[0].fault_level;
       let index = this.arrIndex;
       this.formArr[index].fault_type = this.form.fault_type;
       this.formArr[index].fjposition = this.form.fjposition;
@@ -1978,9 +1978,6 @@ export default {
         element.fault_type_name = that.faultArray.filter((item) => {
           return item.value === element.fault_type;
         })[0].fault_type;
-        element.fault_level = that.faultArray.filter((item) => {
-          return item.value === element.fault_type;
-        })[0].fault_level;
         element.fjposition = that.faultArray.filter((item) => {
           return item.value === element.fault_type;
         })[0].category_fault;
@@ -2227,9 +2224,9 @@ export default {
           // element.important = this.faultArray.filter((item) => {
           //   return item.value === element.fault_type;
           // })[0].important;
-          element.fault_level = this.faultArray.filter((item) => {
-            return item.value === element.fault_type;
-          })[0].fault_level;
+          // element.fault_level = this.faultArray.filter((item) => {
+          //   return item.value === element.fault_type;
+          // })[0].fault_level;
           element.id = this.guid();
           let x =
             Number(this.subForm[index].fault_location.split(",")[0]) ;
