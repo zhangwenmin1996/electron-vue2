@@ -147,8 +147,11 @@
             <el-form class="box-form" :model="form">
               <el-form-item label="图片名称" :label-width="formLabelWidth">
                   <el-input type="textarea" :rows="2" v-model="form.label" style="width: 100%"/>
-                </el-form-item>
-                <el-form-item label="故障位置" :label-width="formLabelWidth">
+              </el-form-item>
+              <el-form-item label="图片位置" :label-width="formLabelWidth">
+                <el-cascader :options="options" v-model="form.img_position" @change="changePoptions" :show-all-levels="false" clearable></el-cascader>
+              </el-form-item>
+              <el-form-item label="故障位置" :label-width="formLabelWidth">
                 <el-select
                   v-model="form.fjposition"
                   @change="changePosition"
@@ -164,7 +167,7 @@
                   >
                   </el-option>
                 </el-select>
-              </el-form-item>
+               </el-form-item>
                 <el-form-item label="故障类型" :label-width="formLabelWidth">
                 <el-select
                   v-model="form.fault_type"
@@ -393,6 +396,80 @@ export default {
       rleData: [], // 最终图像标记
       curMode: 1, // 当前图形类型
       curtext: "",
+      options: [
+        {
+          value: '同塔双回',
+          label: '同塔双回',
+          children: [
+              {
+              value: '塔全貌',
+              label: '塔全貌',
+            }, 
+            {
+              value: '左上相',
+              label: '左上相',
+            }, 
+            {
+              value: '左中相',
+              label: '左中相',
+            }, 
+            {
+              value: '左下相',
+              label: '左下相',
+            },
+            {
+              value: '右上相',
+              label: '右上相',
+            }, 
+            {
+              value: '右中相',
+              label: '右中相',
+            },
+            {
+              value: '右下相',
+              label: '右下相',
+            },
+            {
+              value: '地线',
+              label: '地线',
+            }, 
+            {
+              value: '通道环境',
+              label: '通道环境',
+            }, 
+          ]
+        },
+        {
+          value: '单回杆塔',
+          label: '单回杆塔',
+          children: [
+            {
+              value: '塔全貌',
+              label: '塔全貌',
+            }, 
+            {
+              value: '左相',
+              label: '左相',
+            }, 
+            {
+              value: '中相',
+              label: '中相',
+            }, 
+            {
+              value: '右相',
+              label: '右相',
+            }, 
+            {
+              value: '地线',
+              label: '地线',
+            }, 
+            {
+              value: '通道环境',
+              label: '通道环境',
+            }, 
+          ]
+        },
+      ]
     };
   },
   components: {
@@ -468,6 +545,14 @@ export default {
       // }).then(data=>{
       //   this.fjpositionList = data.data
       // })
+    },
+    changePoptions(val) {
+      if (val) {
+        this.form.img_position = val[val.length - 1]
+          ? val[val.length - 1]
+          : '';
+      }
+      console.log(val,this.form.img_position)
     },
     //   初始化标注组件
     init(val) {
@@ -766,6 +851,7 @@ export default {
                     item.fault_list = element.fault_list;
                     item.error_num = JSON.parse(element.fault_list).length;
                     item.poi_type = element.poi_type;
+                    item.img_position = element.img_position;
                     item.position = element.position;
                     item.show_name = element.show_name
                     item.label = element.show_name
@@ -792,6 +878,7 @@ export default {
               let md5 = item.file_link;
               item.label = src;
               item.md5 = md5;
+              item.img_position = item.img_position
               item.error_num = JSON.parse(item.fault_list).length;
             });
             //  arr = data.report_data.map((item) => {
@@ -2020,6 +2107,7 @@ export default {
           obj = {
             file_name: this.originForm.file_name,
             show_name: this.form.label,
+            img_position: this.form.img_position,
             wtg_plant_id: this.originForm.wtg_plant_id,
             trail: JSON.stringify(element.trail) || "",
             important: 1,
@@ -2064,6 +2152,7 @@ export default {
           obj = {
             file_name:  this.originForm.file_name,
             show_name: this.form.label,
+            img_position: this.form.img_position,
             trail: JSON.stringify(element.trail) || "",
             folder_name: this.originForm.folder_name,
             wtg_plant_id: this.originForm.wtg_plant_id,
@@ -2104,6 +2193,7 @@ export default {
       console.log(subForm,123)
       let data = {
         file_name: this.originForm.file_name,
+        img_position: this.form.img_position,
         task_id: this.originForm.task_id,
         fault_list: JSON.stringify(subForm),
       };
@@ -2577,6 +2667,7 @@ export default {
           imageId: item.id,
           file_name: item.show_name,
           show_name: item.show_name,
+          img_position: item.img_position,
           taskId: item.taskId,
           subtask_id: item.subtask_id,
           label: item.label,
@@ -2704,6 +2795,7 @@ export default {
           element.label = this.form.label;
           element.labelId = this.form.labelId;
           element.fault_type = this.form.fault_type;
+          element.img_position = this.form.img_position;
           element.fault_info = this.form.fault_info;
           element.category_name = this.form.category_name;
           element.fault_level = this.form.fault_level;
