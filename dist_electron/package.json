@@ -1,72 +1,73 @@
 {
-    "name": "electron-vue",
-    "version": "0.1.0",
-    "private": true,
-    "scripts": {
-        "serve": "vue-cli-service serve",
-        "build": "vue-cli-service build",
-        "lint": "vue-cli-service lint",
-        "package": "electron-packager ./ --overwrite -all",
-        "electron:build": "vue-cli-service electron:build",
-        "electron:serve": "vue-cli-service electron:serve",
-        "postinstall": "electron-builder install-app-deps",
-        "postuninstall": "electron-builder install-app-deps",
-        "dist-win": "electron-builder --win --ia32",
-        "dist-win64": "electron-builder --win --x64",
-        "dist-mac": "electron-builder --mac"
+  "name": "electron-vue",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "package": "electron-packager ./ --overwrite -all",
+    "electron:build": "vue-cli-service electron:build",
+    "electron:serve": "vue-cli-service electron:serve",
+    "postinstall": "electron-builder install-app-deps",
+    "postuninstall": "electron-builder install-app-deps",
+    "dist-win": "electron-builder --win --ia32",
+    "dist-win64": "electron-builder --win --x64",
+    "dist-mac": "electron-builder --mac"
+  },
+  "main": "background.js",
+  "dependencies": {
+    "ailabel": "^4.1.3",
+    "ant-design-vue": "^1.7.5",
+    "axios": "^1.6.7",
+    "child_process": "^1.0.2",
+    "core-js": "^3.8.3",
+    "dexie": "^3.2.5",
+    "element-ui": "^2.15.14",
+    "jsencrypt": "3.0.0-rc.1",
+    "minio": "^7.0.19",
+    "node-polyfill-webpack-plugin": "^2.0.1",
+    "node-sass": "^4.14.1",
+    "rebuild": "^0.1.2",
+    "sass-loader": "^7.3.1",
+    "stream": "0.0.2",
+    "vue": "^2.6.14",
+    "vue-router": "^3.5.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.16",
+    "@babel/eslint-parser": "^7.12.16",
+    "@vue/cli-plugin-babel": "~5.0.0",
+    "@vue/cli-plugin-eslint": "~5.0.0",
+    "@vue/cli-service": "~5.0.0",
+    "electron": "^20.0.0",
+    "electron-builder": "^24.12.0",
+    "electron-devtools-installer": "^3.1.0",
+    "eslint": "^7.32.0",
+    "eslint-plugin-vue": "^8.0.3",
+    "vue-cli-plugin-electron-builder": "~2.1.1",
+    "vue-template-compiler": "^2.6.14"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
     },
-    "main": "background.js",
-    "dependencies": {
-        "ailabel": "^4.1.3",
-        "ant-design-vue": "^1.7.5",
-        "axios": "^1.6.7",
-        "child_process": "^1.0.2",
-        "core-js": "^3.8.3",
-        "dexie": "^3.2.5",
-        "element-ui": "^2.15.14",
-        "minio": "^7.0.19",
-        "node-polyfill-webpack-plugin": "^2.0.1",
-        "node-sass": "^4.14.1",
-        "rebuild": "^0.1.2",
-        "sass-loader": "^7.3.1",
-        "stream": "0.0.2",
-        "vue": "^2.6.14",
-        "vue-router": "^3.5.1"
-    },
-    "devDependencies": {
-        "@babel/core": "^7.12.16",
-        "@babel/eslint-parser": "^7.12.16",
-        "@vue/cli-plugin-babel": "~5.0.0",
-        "@vue/cli-plugin-eslint": "~5.0.0",
-        "@vue/cli-service": "~5.0.0",
-        "electron": "^20.0.0",
-        "electron-builder": "^24.12.0",
-        "electron-devtools-installer": "^3.1.0",
-        "eslint": "^7.32.0",
-        "eslint-plugin-vue": "^8.0.3",
-        "vue-cli-plugin-electron-builder": "~2.1.1",
-        "vue-template-compiler": "^2.6.14"
-    },
-    "eslintConfig": {
-        "root": true,
-        "env": {
-            "node": true
-        },
-        "extends": [
-            "plugin:vue/essential",
-            "eslint:recommended"
-        ],
-        "parserOptions": {
-            "parser": "@babel/eslint-parser"
-        },
-        "rules": {}
-    },
-    "permissions": [
-        "file:///*"
+    "extends": [
+      "plugin:vue/essential",
+      "eslint:recommended"
     ],
-    "browserslist": [
-        "> 1%",
-        "last 2 versions",
-        "not dead"
-    ]
+    "parserOptions": {
+      "parser": "@babel/eslint-parser"
+    },
+    "rules": {}
+  },
+  "permissions": [
+    "file:///*"
+  ],
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
 }

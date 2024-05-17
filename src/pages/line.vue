@@ -85,29 +85,33 @@
          <div class="y-file-list"  v-if="!panelShow">
            <div class="title">
               <h2>已上传列表</h2>
+              <el-button @click="selectDel" type="text">
+                批量删除
+              </el-button>
+              <el-button @click="allDel"  type="text">
+                全部删除
+              </el-button>
               <div class="operate">
                 已上传：{{ imgList.length }}
-                <!-- <el-button @click="selectDel" type="text">
-                  批量删除
-                </el-button>
-                <el-button @click="allDel"  type="text">
-                  全部删除
-                </el-button> -->
+               
               </div>
             </div>
            <div class="item-list">
-             <!-- <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange">
+             <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange">
                <el-checkbox v-for="(item,index) in imgList" :key="index" :label="item" class="item-file">
-                 <div class="file-name"><span class="file-icon">📊</span>{{item.name}}</div>
+                <div class="file-name"><span class="file-icon">📊</span>{{item.name}}</div>
+                <el-tooltip class="item" effect="dark" content="查看照片" placement="top">
+                  <div class="file-remove el-icon-picture-outline" @click="seePicture(item)"></div>
+                </el-tooltip>
                   <div class="file-remove el-icon-close" @click="remove(item)"></div>
                </el-checkbox>
-            </el-checkbox-group> -->
-             <div class="item-file" v-for="(item,index) in imgList" :key="index">
+            </el-checkbox-group>
+             <!-- <div class="item-file" v-for="(item,index) in imgList" :key="index">
                <div class="file-name"><span class="file-icon">📊</span>{{item.name}}</div>
                <el-tooltip class="item" effect="dark" content="查看照片" placement="top">
                 <div class="file-remove el-icon-picture-outline" @click="seePicture(item)"></div>
               </el-tooltip>
-             </div>
+             </div> -->
              <div class="no-file" v-if="imgList.length<1">
                 <i class="nucfont inuc-empty-file"></i> 暂无已上传文件
               </div>
@@ -300,15 +304,17 @@ export default {
         this.$message.warning('请先选中要删除的图片！')
         return false
       }
-      this.$confirm("此操作将永久删除选中图片，不可恢复, 是否继续?", "提示", {
+      let that = this
+      that.$confirm("此操作将永久删除选中图片，不可恢复, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
       })
         .then(() => {
-          delObject('line',this.checkedCities).then(data=>{
-            this.getSeafile()
-          })
+          that.checkedCities.forEach(element => {
+            that.$db.imgList.delete(element.fileName)
+          });
+          that.getSeafile()
         })
     },
     allDel(){
@@ -316,27 +322,31 @@ export default {
         this.$message.warning('暂无可删除的图片！')
         return false
       }
+      let that = this
        this.$confirm("此操作将永久删除所有图片，不可恢复, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
       })
         .then(() => {
-          delObject('line',this.imgList).then(data=>{
-            this.getSeafile()
-          })
+          that.imgList.forEach(element => {
+            that.$db.imgList.delete(element.fileName)
+          });
+          that.getSeafile()
+          // delObject('line',this.imgList).then(data=>{
+          //   this.getSeafile()
+          // })
         })
     },
-    remove(item){
+    async remove(item){
       this.$confirm("此操作将永久删除该图片，不可恢复, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
       })
         .then(() => {
-          delObject('line',item).then(data=>{
+           this.$db.imgList.delete(item.fileName)
             this.getSeafile()
-          })
         })
       
     },
@@ -681,7 +691,15 @@ export default {
       margin-right: 10px;
     }
   }
-  .item-list{
+  
+}
+#global-uploader-btn2 {
+  margin: 0 20px 10px 0;
+  background: #1890ff;
+}
+</style>
+<style lang="scss">
+.item-list{
     list-style-type: none;
     height: 380px;
     overflow-y: scroll;
@@ -694,41 +712,11 @@ export default {
       line-height: 49px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
       margin: 0;
       padding: 0 5px;
       overflow: hidden;
       border-bottom: 1px solid #cdcdcd;
-      >>>.el-checkbox__label{
-        display: flex;
-        height: 49px;
-        width: 630px;
-        line-height: 49px;
-        align-items: center;
-        z-index: 99;
-        .file-name {
-          width: 90%;
-          display: flex;
-          align-items: center;
-          overflow: hidden;
-          white-space: nowrap;
-          text-overflow: ellipsis;
-          text-indent: 14px;
-        }
-        .file-icon {
-          // width: 24px;
-          // height: 24px;
-          display: inline-block;
-          vertical-align: top;
-        }
-        .file-remove{
-          font-size: 22px;
-          cursor: pointer;
-          &:hover{
-            color: #1890ff;
-          }
-        }
-      }
+      
       
     }
     .no-file {
@@ -736,9 +724,36 @@ export default {
       text-align: center;
     }
   }
-}
-#global-uploader-btn2 {
-  margin: 0 20px 10px 0;
-  background: #1890ff;
+.el-checkbox__label{
+  display: flex !important;
+  height: 49px;
+  width: 630px  !important;
+  line-height: 49px;
+  align-items: center;
+  z-index: 99;
+  .file-name {
+    width: 90%;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-indent: 14px;
+  }
+  .file-icon {
+    // width: 24px;
+    // height: 24px;
+    display: inline-block;
+    vertical-align: top;
+  }
+  .file-remove{
+    display: flex;
+    margin-right: 20px;
+    font-size: 22px;
+    cursor: pointer;
+    &:hover{
+      color: #1890ff;
+    }
+  }
 }
 </style>
