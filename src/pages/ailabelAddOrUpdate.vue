@@ -1911,6 +1911,7 @@ export default {
     },
     setdrawRect(row, form = undefined) {
       // this.form = JSON.parse(JSON.stringify(this.form));
+      console.log(row,form,11111)
       this.setSelected();
       this.setMode("RECT");
       let data = row.data;
@@ -1936,6 +1937,7 @@ export default {
         this.form.fault_type = form.fault_type;
         this.form.handling_suggestions = form.handling_suggestions;
         this.form.fault_level = form.fault_level;
+        this.form.img_position = form.img_position;
         this.form.important = form.important - 0 ? true : false;
       }
       this.initText();
