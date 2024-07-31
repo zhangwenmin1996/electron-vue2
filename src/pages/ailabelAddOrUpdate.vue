@@ -673,6 +673,7 @@ export default {
       this.formArr[index].fault_type_name = this.form.fault_type;
       this.formArr[index].fjposition = this.form.fjposition;
       this.formArr[index].category_name = this.form.fjposition;
+      this.formArr[index].category_fault = this.form.fjposition;
       this.formArr[index].handling_suggestions =
         this.form.handling_suggestions != ""
           ? this.form.handling_suggestions
@@ -1944,6 +1945,8 @@ export default {
         this.form.handling_suggestions = form.handling_suggestions;
         this.form.fault_level = form.fault_level;
         this.form.img_position = form.img_position;
+        this.form.fjposition = form.fjposition;
+        this.form.img_position = form.img_position;
         this.form.important = form.important - 0 ? true : false;
       }
       this.initText();
@@ -2084,6 +2087,7 @@ export default {
         element.fault_info = this.formArr[index].fault_type
         element.fault_type_name = this.formArr[index].fault_type
         element.category_name = this.formArr[index].fjposition
+        element.category_fault = this.formArr[index].fjposition
         element.img_position = this.formArr[index].img_position
         // element.category_fault = that.faultArray.filter((item) => {
         //   return item.value === element.fault_type;
@@ -2684,14 +2688,14 @@ export default {
           subtask_id: item.subtask_id,
           label: item.label,
           labelId: item.labelId,
-          fault_type: mark_info[0].fault_type_code,
+          fault_type: mark_info.fault_type_code,
           errorNum: item.error_num,
           wtg_id: item.wtg_id,
           handling_suggestions: item.handling_suggestions,
           fault_level: item.fault_level,
           important: item.important,
           ypId: item.position,
-          fjposition: mark_info[0].category_name
+          fjposition: mark_info.category_name
         };
         this.imageId = item.id;
         this.imageName = item.name;
