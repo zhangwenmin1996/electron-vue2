@@ -149,10 +149,12 @@
                   <el-input type="textarea" :rows="2" v-model="form.label" style="width: 100%"/>
               </el-form-item>
               <el-form-item label="图片位置" :label-width="formLabelWidth">
-                <el-cascader :options="options" v-model="form.img_position" @change="changePoptions" :show-all-levels="false" clearable></el-cascader>
+                <el-input size="small" v-model="form.img_position" @change="changeSelect" laceholder="请输入图片位置"/>
+                <!-- <el-cascader :options="options" v-model="form.img_position" @change="changePoptions" :show-all-levels="false" clearable></el-cascader> -->
               </el-form-item>
               <el-form-item label="故障位置" :label-width="formLabelWidth">
-                <el-select
+                <el-input size="small" v-model="form.fjposition" @change="changeSelect" laceholder="请输入故障位置"/>
+                <!-- <el-select
                   v-model="form.fjposition"
                   @change="changePosition"
                   placeholder="请选择故障位置"
@@ -166,10 +168,11 @@
                     :label="item.name"
                   >
                   </el-option>
-                </el-select>
+                </el-select> -->
                </el-form-item>
                 <el-form-item label="故障类型" :label-width="formLabelWidth">
-                <el-select
+                  <el-input size="small" v-model="form.fault_type" @change="changeSelect" laceholder="请输入故障类型"/>
+                <!-- <el-select
                   v-model="form.fault_type"
                   size="small"
                   :showSearch="true"
@@ -184,7 +187,7 @@
                     :label="item.fault_type"
                   >
                   </el-option>
-                </el-select>
+                </el-select> -->
               </el-form-item>
               
               <!-- <el-form-item label="图片编号">
@@ -193,7 +196,7 @@
              
               <el-form-item label="故障等级" :label-width="formLabelWidth">
                 <!-- <el-input v-model="form.fault_level" size="small"  /> -->
-                <el-select v-model="form.fault_level"  @change="changeSelect">
+                <el-select v-model="form.fault_level" @change="changeSelect">
                   <el-option
                     v-for="(item, index) in ['一般','重要','危急']"
                     :key="index"
@@ -208,7 +211,7 @@
                   type="textarea"
                   :rows="2"
                   size="small"
-                  
+                  @change="changeSelect"
                 />
               </el-form-item>
               <el-form-item label="故障数量" :label-width="formLabelWidth">
@@ -645,36 +648,39 @@ export default {
     // 单选
     changeSelect() {
       console.log(this.faultArray,222)
-      if (!this.form.fault_type || this.form.fault_type == "fault") {
-          this.$message.warning("请选择故障类型!");
-          return false;
-        }
-      this.form.fjposition = this.faultArray.filter((item) => {
-        return item.value === this.form.fault_type;
-      })[0].category_fault;
-      this.form.category_name = this.fjpositionList.filter((item) => {
-        return item.code == this.form.fjposition;
-      })[0].name
-      this.form.handling_suggestions = this.faultArray.filter((item) => {
-        return item.value === this.form.fault_type;
-      })[0].handling_suggestions;
-      this.form.fault_info = this.faultArray.filter((item) => {
-        return item.value === this.form.fault_type;
-      })[0].fault_type;
+      // if (!this.form.fault_type || this.form.fault_type == "fault") {
+      //     this.$message.warning("请选择故障类型!");
+      //     return false;
+      //   }
+      // this.form.fjposition = this.faultArray.filter((item) => {
+      //   return item.value === this.form.fault_type;
+      // })[0].category_fault;
+      // this.form.category_name = this.fjpositionList.filter((item) => {
+      //   return item.code == this.form.fjposition;
+      // })[0].name
+      // this.form.handling_suggestions = this.faultArray.filter((item) => {
+      //   return item.value === this.form.fault_type;
+      // })[0].handling_suggestions;
+      // this.form.fault_info = this.faultArray.filter((item) => {
+      //   return item.value === this.form.fault_type;
+      // })[0].fault_type;
       // this.form.fault_level = this.faultArray.filter((item) => {
       //   return item.value === this.form.fault_type;
       // })[0].fault_level;
       let index = this.arrIndex;
       this.formArr[index].fault_type = this.form.fault_type;
+      this.formArr[index].img_position = this.form.img_position;
+      this.formArr[index].fault_type_name = this.form.fault_type;
       this.formArr[index].fjposition = this.form.fjposition;
-      this.formArr[index].category_name = this.form.category_name;
+      this.formArr[index].category_name = this.form.fjposition;
       this.formArr[index].handling_suggestions =
         this.form.handling_suggestions != ""
           ? this.form.handling_suggestions
           : "暂无建议";
-      this.formArr[index].fault_info = this.form.fault_info;
+      this.formArr[index].fault_info = this.form.fault_type;
       this.formArr[index].fault_level = this.form.fault_level;
       this.formArr[index].important = this.form.important;
+      console.log(this.formArr,this.arrIndex,9998)
       // this.form.errorNum = this.form.fault_type === "-1" ? 0 : 1;
     },
     changeSwitch() {
@@ -2058,26 +2064,30 @@ export default {
         console.log(element,index,333)
         // errorNum = errorNum - 0 + (element.errorNum - 0);
         let obj;
-        if (!element.fault_type || element.fault_type == "fault") {
-          that.$message.warning("请选择故障类型!");
-          return false;
-        }
-        element.fault_info = that.faultArray.filter((item) => {
-          return item.value === element.fault_type;
-        })[0].fault_info;
-        element.fault_type_name = that.faultArray.filter((item) => {
-          return item.value === element.fault_type;
-        })[0].fault_type;
-        element.fjposition = that.faultArray.filter((item) => {
-          return item.value === element.fault_type;
-        })[0].category_fault;
-        element.category_name = that.fjpositionList.filter((item) => {
-          return item.code == element.fjposition;
-        })[0].name
+        // if (!element.fault_type || element.fault_type == "fault") {
+        //   that.$message.warning("请选择故障类型!");
+        //   return false;
+        // }
+        // element.fault_info = that.faultArray.filter((item) => {
+        //   return item.value === element.fault_type;
+        // })[0].fault_info;
+        // element.fault_type_name = that.faultArray.filter((item) => {
+        //   return item.value === element.fault_type;
+        // })[0].fault_type;
+        // element.fjposition = that.faultArray.filter((item) => {
+        //   return item.value === element.fault_type;
+        // })[0].category_fault;
+        // element.category_name = that.fjpositionList.filter((item) => {
+        //   return item.code == element.fjposition;
+        // })[0].name
         element.fault_level = this.formArr[index].fault_level
-        element.category_fault = that.faultArray.filter((item) => {
-          return item.value === element.fault_type;
-        })[0].category_fault;
+        element.fault_info = this.formArr[index].fault_type
+        element.fault_type_name = this.formArr[index].fault_type
+        element.category_name = this.formArr[index].fjposition
+        element.img_position = this.formArr[index].img_position
+        // element.category_fault = that.faultArray.filter((item) => {
+        //   return item.value === element.fault_type;
+        // })[0].category_fault;
         // element.trail = this.setSizeMask(element.maskPoints, {
         //   width: imgWidth,
         //   height: imgHeight,
@@ -2301,27 +2311,27 @@ export default {
             ).fault_type_code;
           }
         } else {
-          element.fault_type = element.fault_type_code;
-          if (!element.fault_type || element.fault_type == "fault") {
-          this.$message.warning("请选择故障类型!");
-          return false;
-        }
-          element.handling_suggestions = this.faultArray.filter((item) => {
-            return item.value === element.fault_type;
-          })[0].handling_suggestions;
-          element.fjposition = this.faultArray.filter((item) => {
-            return item.value === element.fault_type;
-          })[0].category_fault;
-          element.category_name = that.fjpositionList.filter((item) => {
-          return item.code == element.fjposition;
-        })[0].name
-          // important
-          // element.important = this.faultArray.filter((item) => {
-          //   return item.value === element.fault_type;
-          // })[0].important;
-          // element.fault_level = this.faultArray.filter((item) => {
-          //   return item.value === element.fault_type;
-          // })[0].fault_level;
+          element.fault_type = element.fault_type_name;
+          element.fjposition = element.category_name;
+        //   if (!element.fault_type || element.fault_type == "fault") {
+        //   this.$message.warning("请选择故障类型!");
+        //   return false;
+        // }
+        //   element.handling_suggestions = this.faultArray.filter((item) => {
+        //     return item.value === element.fault_type;
+        //   })[0].handling_suggestions;
+        //   element.fjposition = this.faultArray.filter((item) => {
+        //     return item.value === element.fault_type;
+        //   })[0].category_fault;
+        //   element.category_name = that.fjpositionList.filter((item) => {
+        //   return item.code == element.fjposition;
+        // })[0].name
+        //   element.important = this.faultArray.filter((item) => {
+        //     return item.value === element.fault_type;
+        //   })[0].important;
+        //   element.fault_level = this.faultArray.filter((item) => {
+        //     return item.value === element.fault_type;
+        //   })[0].fault_level;
           element.id = this.guid();
           let x =
             Number(this.subForm[index].fault_location.split(",")[0]) ;
@@ -2674,14 +2684,14 @@ export default {
           subtask_id: item.subtask_id,
           label: item.label,
           labelId: item.labelId,
-          fault_type: mark_info.fault_type_code,
+          fault_type: mark_info[0].fault_type_code,
           errorNum: item.error_num,
           wtg_id: item.wtg_id,
           handling_suggestions: item.handling_suggestions,
           fault_level: item.fault_level,
           important: item.important,
           ypId: item.position,
-          fjposition: item.fjposition
+          fjposition: mark_info[0].category_name
         };
         this.imageId = item.id;
         this.imageName = item.name;
@@ -2731,11 +2741,12 @@ export default {
 
       // this.initgMap();
       this.successed();
-      if(this.form.fault_type){
-        this.form.fjposition = this.faultArray.filter((item) => {
-          return item.value === this.form.fault_type;
-        })[0].category_fault;
-      }
+      console.log(this.subForm,this.form,4444)
+      // if(this.form.fault_type){
+      //   this.form.fjposition = this.faultArray.filter((item) => {
+      //     return item.value === this.form.fault_type;
+      //   })[0].category_fault;
+      // }
       this.saveLoading = false;
     },
     // 初始化文字标注
@@ -2965,13 +2976,13 @@ export default {
             console.log("点击：", this.formArr, this.arrIndex);
             //  gFirstFeatureLayer.update({obj.id,})
             this.form = JSON.parse(JSON.stringify(obj));
-            if (!this.form.fault_type || this.form.fault_type == "fault") {
-                this.$message.warning("请选择故障类型!");
-                return false;
-              }
-            this.form.fjposition = this.faultArray.filter((item) => {
-              return item.value === this.form.fault_type;
-            })[0].category_fault;
+            // if (!this.form.fault_type || this.form.fault_type == "fault") {
+            //     this.$message.warning("请选择故障类型!");
+            //     return false;
+            //   }
+            // this.form.fjposition = this.faultArray.filter((item) => {
+            //   return item.value === this.form.fault_type;
+            // })[0].category_fault;
             this.getErrorType(this.form.fjposition)
             this.getscreenToWorld(this.form.points);
             break;
