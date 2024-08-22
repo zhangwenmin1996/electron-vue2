@@ -296,7 +296,5 @@ props:{
     text-align: center;
     margin-top: 20px;
 }
->>>.el-range-input{
-   color: #fff !important;
-}
+
 </style>

@@ -35,6 +35,10 @@ module.exports = defineConfig({
                 "directories": {
                     "output": "./dist" //输出文件路径
                 },
+                extraResources: [{
+                    from: 'src/static/',
+                    to: 'static/',
+                }, ],
                 // "publish": [ //配置更新程序的服务器地址
                 //     {
                 //         "provider": "generic",

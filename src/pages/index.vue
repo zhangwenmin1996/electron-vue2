@@ -478,10 +478,10 @@ export default {
        
         });
       }
-      const exePath = '../../public/main.exe';
-      const docxPath = '../../public/template_line_m30t.docx';
-     const publicExePath = process.env.NODE_ENV== 'development'? "E:/web/electron-vue2/public/main.exe":  path.join(__dirname, exePath);
-     const publicDocxPath =process.env.NODE_ENV== 'development'? "E:/web/electron-vue2/public/template_line_m30t.docx": path.join(__dirname, docxPath);
+      const exePath = '../static/main.exe';
+      const docxPath = '../static/template_line_m30t.docx';
+     const publicExePath = process.env.NODE_ENV== 'development'? "E:/web/electron-vue2/src/static/main.exe":  path.join(__dirname, exePath);
+     const publicDocxPath =process.env.NODE_ENV== 'development'? "E:/web/electron-vue2/src/static/template_line_m30t.docx": path.join(__dirname, docxPath);
 
       console.log('文件夹:',process.env.NODE_ENV,publicExePath,publicDocxPath);
      setTimeout(() => {

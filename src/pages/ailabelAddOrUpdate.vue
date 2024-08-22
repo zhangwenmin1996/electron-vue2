@@ -1146,6 +1146,7 @@ export default {
       let index = this.arrIndex;
       this.getErrorType(val)
       this.form.fault_type = null
+      this.$forceUpdate();
       this.formArr[index].fjposition = val;
     },
     // 查看时，不许标注
