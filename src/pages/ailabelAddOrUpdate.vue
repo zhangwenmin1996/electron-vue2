@@ -149,14 +149,15 @@
                   <el-input type="textarea" :rows="2" v-model="form.label" style="width: 100%"/>
               </el-form-item>
               <el-form-item label="图片位置" :label-width="formLabelWidth">
-                <el-input size="small" v-model="form.img_position" @change="changeSelect" laceholder="请输入图片位置"/>
-                <!-- <el-cascader :options="options" v-model="form.img_position" @change="changePoptions" :show-all-levels="false" clearable></el-cascader> -->
+                <!-- <el-input size="small" v-model="form.img_position" @change="changeSelect" laceholder="请输入图片位置"/> -->
+                <el-cascader :options="options" v-model="form.img_position" @change="changePoptions" :show-all-levels="false" filterable clearable :before-filter="handleBlur"></el-cascader>
               </el-form-item>
               <el-form-item label="故障位置" :label-width="formLabelWidth">
-                <el-input size="small" v-model="form.fjposition" @change="changeSelect" laceholder="请输入故障位置"/>
-                <!-- <el-select
+                <!-- <el-input size="small" v-model="form.fjposition" @change="changeSelect" laceholder="请输入故障位置"/> -->
+                <el-select
                   v-model="form.fjposition"
                   @change="changePosition"
+                  filterable allow-create default-first-option 
                   placeholder="请选择故障位置"
                   size="small"
                   style="width: 100%"
@@ -164,19 +165,20 @@
                   <el-option
                     v-for="(item, index) in fjpositionList"
                     :key="index"
-                     :value="item.code"
+                     :value="item.name"
                     :label="item.name"
                   >
                   </el-option>
-                </el-select> -->
+                </el-select>
                </el-form-item>
                 <el-form-item label="故障类型" :label-width="formLabelWidth">
-                  <el-input size="small" v-model="form.fault_type" @change="changeSelect" laceholder="请输入故障类型"/>
-                <!-- <el-select
+                  <!-- <el-input size="small" v-model="form.fault_type" @change="changeSelect" laceholder="请输入故障类型"/> -->
+                <el-select
                   v-model="form.fault_type"
                   size="small"
                   :showSearch="true"
                   @change="changeSelect"
+                  filterable allow-create default-first-option 
                   placeholder="请选择故障类型"
                   style="width: 100%"
                 >
@@ -187,7 +189,7 @@
                     :label="item.fault_type"
                   >
                   </el-option>
-                </el-select> -->
+                </el-select>
               </el-form-item>
               
               <!-- <el-form-item label="图片编号">
@@ -196,7 +198,7 @@
              
               <el-form-item label="故障等级" :label-width="formLabelWidth">
                 <!-- <el-input v-model="form.fault_level" size="small"  /> -->
-                <el-select v-model="form.fault_level" @change="changeSelect">
+                <el-select v-model="form.fault_level" filterable allow-create default-first-option @change="changeSelect">
                   <el-option
                     v-for="(item, index) in ['一般','重要','危急']"
                     :key="index"
@@ -472,7 +474,8 @@ export default {
             }, 
           ]
         },
-      ]
+      ],
+      tempInput: '',
     };
   },
   components: {
@@ -537,8 +540,37 @@ export default {
       }
     },
     async getDict() { // 修改  formdata传值方式
-     let data = await this.$db.lineList.toArray()
-      this.fjpositionList = data
+     
+      this.fjpositionList = [
+        {
+          name: "绝缘子",
+          code: 1,
+        },
+        {
+          name: "金具",
+          code: 2,
+        },
+        {
+          name: "导地线",
+          code: 3,
+        },
+        {
+          name: "附属设施",
+          code: 4,
+        },
+        {
+          name: "杆塔",
+          code: 5,
+        },
+        {
+          name: "基础",
+          code: 6,
+        },
+        {
+          name: "通道环境",
+          code: 7,
+        },
+      ]
       //   this.$http({
       //     url: 'api/sys/sys/sysDic/queryList',
       //     method: 'post',
@@ -549,13 +581,44 @@ export default {
       //   this.fjpositionList = data.data
       // })
     },
+    checkLabelExists(arr, targetLabel) {
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i].label === targetLabel) {
+          return true;
+        }
+        if (arr[i].children && arr[i].children.length > 0) {
+          if (this.checkLabelExists(arr[i].children, targetLabel)) {
+            return true;
+          }
+        }
+      }
+      return false;
+    },
+    handleBlur(val){
+      console.log(val,5555)
+      let that = this
+      let inputValue = val
+      if (inputValue) {
+        // 检查是否已存在
+        const found = that.checkLabelExists(that.options, inputValue)
+        if (!found) {
+          // 添加新的选项
+          const newOption = {
+            value: inputValue,
+            label: inputValue,
+          };
+          that.options.push(newOption);
+          that.form.img_position = [newOption.value];
+        }
+      }
+    },
     changePoptions(val) {
       if (val) {
         this.form.img_position = val[val.length - 1]
           ? val[val.length - 1]
           : '';
       }
-      console.log(val,this.form.img_position)
+      console.log(val,this.form.img_position,666666)
     },
     //   初始化标注组件
     init(val) {
@@ -609,14 +672,400 @@ export default {
     },
     async getErrorType(type) {
    
-          let data = await this.$db.typeList.toArray()
+          let data = [
+            {
+              category_fault: '绝缘子',
+              value: '绝缘子串球头侧R型插销退出',
+              fault_type: '绝缘子串球头侧R型插销退出',
+            },
+            {
+              category_fault: '绝缘子',
+              value: '绝缘子串球头侧R型插销缺失',
+              fault_type: '绝缘子串球头侧R型插销缺失',
+            },
+            {
+              category_fault: '绝缘子',
+              value: '绝缘子串碗头侧R型插销退出',
+              fault_type: '绝缘子串碗头侧R型插销退出',
+            },
+            {
+              category_fault: '绝缘子',
+              value: '绝缘子串碗头侧R型插销缺失',
+              fault_type: '绝缘子串碗头侧R型插销缺失',
+            },
+            {
+              category_fault: '绝缘子',
+              value: '绝缘子脏污',
+              fault_type: '绝缘子脏污',
+            },
+            {
+              category_fault: '绝缘子',
+              value: '绝缘子裂纹',
+              fault_type: '绝缘子裂纹',
+            },
+            {
+              category_fault: '绝缘子',
+              value: '绝缘子自爆',
+              fault_type: '绝缘子自爆',
+            },
+            {
+              category_fault: '绝缘子',
+              value: '绝缘子破损',
+              fault_type: '绝缘子破损',
+            },
+            {
+              category_fault: '绝缘子',
+              value: '绝缘子串有雷击痕迹',
+              fault_type: '绝缘子串有雷击痕迹',
+            },
+            {
+              category_fault: '绝缘子',
+              value: '绝缘子串有拉弧放电痕迹',
+              fault_type: '绝缘子串有拉弧放电痕迹',
+            },
+            {
+              category_fault: '绝缘子',
+              value: '支撑绝缘子绑扎不规范',
+              fault_type: '支撑绝缘子绑扎不规范',
+            },
+            {
+              category_fault: '绝缘子',
+              value: '支撑绝缘子松动',
+              fault_type: '支撑绝缘子松动',
+            },
+            {
+              category_fault: '绝缘子',
+              value: '支撑绝缘子倾斜',
+              fault_type: '支撑绝缘子倾斜',
+            },
+            {
+              category_fault: '绝缘子',
+              value: '绝缘子球头锈蚀',
+              fault_type: '绝缘子球头锈蚀',
+            },
+            {
+              category_fault: '绝缘子',
+              value: '绝缘子碗头锈蚀',
+              fault_type: '绝缘子碗头锈蚀',
+            },
+            {
+              category_fault: '绝缘子',
+              value: '绝缘子串上有异物',
+              fault_type: '绝缘子串上有异物',
+            },
+            {
+              category_fault: '绝缘子',
+              value: '绝缘子防污帽松动',
+              fault_type: '绝缘子防污帽松动',
+            },
+            {
+              category_fault: '绝缘子',
+              value: '均压环移位',
+              fault_type: '均压环移位',
+            },
+            {
+              category_fault: '金具',
+              value: '联板R型插销缺失',
+              fault_type: '联板R型插销缺失',
+            },
+            {
+              category_fault: '金具',
+              value: '联板R型插销退出',
+              fault_type: '联板R型插销退出',
+            },
+            {
+              category_fault: '金具',
+              value: '联板螺母缺失',
+              fault_type: '联板螺母缺失',
+            },
+            {
+              category_fault: '金具',
+              value: '联板螺母退出',
+              fault_type: '联板螺母退出',
+            },
+            {
+              category_fault: '金具',
+              value: '挂环R型插销缺失',
+              fault_type: '挂环R型插销缺失',
+            },
+            {
+              category_fault: '金具',
+              value: '挂环R型插销退出',
+              fault_type: '挂环R型插销退出',
+            },{
+              category_fault: '金具',
+              value: '螺栓垫片缺失',
+              fault_type: '螺栓垫片缺失',
+            },
+            {
+              category_fault: '金具',
+              value: '挂环螺母缺失',
+              fault_type: '挂环螺母缺失',
+            },
+            {
+              category_fault: '金具',
+              value: '挂环螺母退出',
+              fault_type: '挂环螺母退出',
+            },
+            {
+              category_fault: '金具',
+              value: '螺栓弹簧片缺失',
+              fault_type: '螺栓弹簧片缺失',
+            },
+            {
+              category_fault: '金具',
+              value: '金具缺插销',
+              fault_type: '金具缺插销',
+            },
+            {
+              category_fault: '金具',
+              value: '线夹有放电痕迹',
+              fault_type: '线夹有放电痕迹',
+            },
+            {
+              category_fault: '金具',
+              value: '线夹锈蚀',
+              fault_type: '线夹锈蚀',
+            },
+            {
+              category_fault: '金具',
+              value: '导线与支柱绝缘子固定不牢',
+              fault_type: '导线与支柱绝缘子固定不牢',
+            },
+            {
+              category_fault: '金具',
+              value: '金具有放电灼烧痕迹',
+              fault_type: '金具有放电灼烧痕迹',
+            },
+            {
+              category_fault: '金具',
+              value: '导、地线防振锤脱落',
+              fault_type: '导、地线防振锤脱落',
+            },
+            {
+              category_fault: '金具',
+              value: '金具有裂纹',
+              fault_type: '金具有裂纹',
+            },
+            {
+              category_fault: '金具',
+              value: '金具锈蚀',
+              fault_type: '金具锈蚀',
+            },
+            {
+              category_fault: '金具',
+              value: '防震锤脱落',
+              fault_type: '防震锤脱落',
+            },
+            {
+              category_fault: '金具',
+              value: '防震锤滑移',
+              fault_type: '防震锤滑移',
+            },
+            {
+              category_fault: '金具',
+              value: '金具受力部位变形',
+              fault_type: '金具受力部位变形',
+            },
+            {
+              category_fault: '导地线',
+              value: '导线散股',
+              fault_type: '导线散股',
+            },
+            {
+              category_fault: '导地线',
+              value: '地线散股',
+              fault_type: '地线散股',
+            },
+            {
+              category_fault: '导地线',
+              value: '导线断股',
+              fault_type: '导线断股',
+            },
+            {
+              category_fault: '导地线',
+              value: '地线断股',
+              fault_type: '地线断股',
+            },
+            {
+              category_fault: '导地线',
+              value: '螺栓锈蚀',
+              fault_type: '螺栓锈蚀',
+            },
+            {
+              category_fault: '导地线',
+              value: '接头发热',
+              fault_type: '接头发热',
+            },
+            {
+              category_fault: '导地线',
+              value: '导线锈蚀',
+              fault_type: '导线锈蚀',
+            },
+            {
+              category_fault: '导地线',
+              value: '地线锈蚀',
+              fault_type: '地线锈蚀',
+            },
+            {
+              category_fault: '导地线',
+              value: '电缆头外护套破损',
+              fault_type: '电缆头外护套破损',
+            },
+            {
+              category_fault: '导地线',
+              value: '导线有异物',
+              fault_type: '导线有异物',
+            },
+            {
+              category_fault: '导地线',
+              value: '地线有异物',
+              fault_type: '地线有异物',
+            },
+            {
+              category_fault: '导地线',
+              value: '地线接地端安装不规范',
+              fault_type: '地线接地端安装不规范',
+            },
+            {
+              category_fault: '导地线',
+              value: '塔基接地扁铁未可靠接地',
+              fault_type: '塔基接地扁铁未可靠接地',
+            },
+            {
+              category_fault: '附属设施',
+              value: '避雷器破损',
+              fault_type: '避雷器破损',
+            },
+            {
+              category_fault: '附属设施',
+              value: '避雷器未接地',
+              fault_type: '避雷器未接地',
+            },
+            {
+              category_fault: '附属设施',
+              value: '避雷器与导线脱离',
+              fault_type: '避雷器与导线脱离',
+            },
+            {
+              category_fault: '附属设施',
+              value: '避雷器计数器失灵',
+              fault_type: '避雷器计数器失灵',
+            },
+            {
+              category_fault: '附属设施',
+              value: '避雷器接地线位置安装错误',
+              fault_type: '避雷器接地线位置安装错误',
+            },
+            {
+              category_fault: '附属设施',
+              value: '塔号牌缺失',
+              fault_type: '塔号牌缺失',
+            },
+            {
+              category_fault: '附属设施',
+              value: '电缆穿管处未封堵',
+              fault_type: '电缆穿管处未封堵',
+            },
+            {
+              category_fault: '附属设施',
+              value: '防鸟罩破损',
+              fault_type: '防鸟罩破损',
+            },
+            {
+              category_fault: '附属设施',
+              value: '防鸟罩脱落',
+              fault_type: '防鸟罩脱落',
+            },
+            {
+              category_fault: '杆塔',
+              value: '杆塔上有异物',
+              fault_type: '杆塔上有异物',
+            },
+            {
+              category_fault: '杆塔',
+              value: '杆塔上有鸟窝',
+              fault_type: '杆塔上有鸟窝',
+            },
+            {
+              category_fault: '杆塔',
+              value: '塔材缺失',
+              fault_type: '塔材缺失',
+            },
+            {
+              category_fault: '杆塔',
+              value: '杆塔锈蚀',
+              fault_type: '杆塔锈蚀',
+            },
+            {
+              category_fault: '杆塔',
+              value: '螺栓缺失',
+              fault_type: '螺栓缺失',
+            },
+            {
+              category_fault: '杆塔',
+              value: '螺帽退出',
+              fault_type: '螺帽退出',
+            },
+            {
+              category_fault: '杆塔',
+              value: '主要受力构件松动',
+              fault_type: '主要受力构件松动',
+            },
+            {
+              category_fault: '杆塔',
+              value: '主要受力构件变形',
+              fault_type: '主要受力构件变形',
+            },
+            {
+              category_fault: '杆塔',
+              value: '杆塔倾斜',
+              fault_type: '杆塔倾斜',
+            },
+            {
+              category_fault: '基础',
+              value: '基础倾斜',
+              fault_type: '基础倾斜',
+            },
+            {
+              category_fault: '基础',
+              value: '基础附件水土流失',
+              fault_type: '基础附件水土流失',
+            },
+            {
+              category_fault: '基础',
+              value: '基础长期泡水',
+              fault_type: '基础长期泡水',
+            },
+            {
+              category_fault: '基础',
+              value: '基础立柱裂纹',
+              fault_type: '基础立柱裂纹',
+            },
+            {
+              category_fault: '基础',
+              value: '基础钢筋外露',
+              fault_type: '基础钢筋外露',
+            },
+            {
+              category_fault: '基础',
+              value: '基础边坡塌陷',
+              fault_type: '基础边坡塌陷',
+            },
+            {
+              category_fault: '通道环境',
+              value: '树障',
+              fault_type: '树障',
+            },
+            {
+              category_fault: '通道环境',
+              value: '通道异物',
+              fault_type: '通道异物',
+            },
+          ]
           let list = []
           let arr = data
-          for (let index = 0; index < arr.length; index++) {
-            const element = arr[index];
-            element.value = element.fault_type_code;
-          }
-           this.faultArray = arr
+            console.log(type,11111)
           if(type){
             list = arr.filter((item) => {
               return item.category_fault === type;
@@ -1554,7 +2003,7 @@ export default {
       that = this;
       this.showmarkimg();
       this.huixian();
-      this.setMode("RECT");
+      this.setMode("PAN");
       // 绘制结束
       gMap.events.on("drawDone", (type, data, data1) => {
         // console.log('type, data', type, data);
@@ -2309,10 +2758,7 @@ export default {
           // 操作页面保存的故障类型为数字
 
           if (this.myIsNaN(element.fault_type - 0)) {
-            element.fault_type = this.getLabelByValue(
-              element.fault_type_code,
-              this.faultArray
-            ).fault_type_code;
+            element.fault_type = element.fault_type_code;
           }
         } else {
           element.fault_type = element.fault_type_name;
@@ -2678,6 +3124,20 @@ export default {
           // item.errorForm
         } else {
           item.errorForm = [];
+        }
+        let inputValue = item.img_position
+        if (inputValue) {
+        // 检查是否已存在
+        const found = that.checkLabelExists(that.options, inputValue)
+          if (!found) {
+            // 添加新的选项
+            const newOption = {
+              value: inputValue,
+              label: inputValue,
+            };
+            this.options.push(newOption);
+            this.form.img_position = [newOption.value];
+          }
         }
         this.form = {
           imageId: item.id,

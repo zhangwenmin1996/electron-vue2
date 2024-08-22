@@ -38,7 +38,14 @@ export function parseTime(time, pattern) {
     })
     return time_str
 }
-
+/**
+ * 获取uuid
+ */
+export function getUUID() {
+    return 'xxxxxxxxxxxxxxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        return (c === 'x' ? (Math.random() * 16 | 0) : ('r&0x3' | '0x8')).toString(16)
+    })
+}
 // 获取Base64
 export function getBase64(imgUrl) {
     return new Promise((resolve) => {

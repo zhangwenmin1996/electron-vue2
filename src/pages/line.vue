@@ -30,9 +30,9 @@
           >上传文件夹</uploader-btn
         >
         <!-- <el-checkbox v-model="checked1" @change="setChecked1">发起自动分析</el-checkbox> -->
-        <el-checkbox v-model="checked2" @change="setChecked2"
+        <!-- <el-checkbox v-model="checked2" @change="setChecked2"
           >放弃自动分析</el-checkbox
-        >
+        > -->
         <el-tabs  v-model="isName" @tab-click="refresh">
           <el-tab-pane name="1" label="待上传列表"> </el-tab-pane>
           <el-tab-pane name="2" label="已上传列表"> </el-tab-pane>
@@ -228,6 +228,7 @@ export default {
     init(val) {
       this.propData = {
         line_task_id: val.taskPlanCode,
+        planCode: val.planCode,
         line_plant_id: val.baseCode,
         line_id: val.planArea,
         renameModelType: val.renameModelType,
@@ -481,7 +482,7 @@ export default {
       this.visible = false;
       let id = this.propData.taskId
       this.$db.dataList.update(id,{status:1,isSync: 0,statusName: '已上传数据',localStatus: '已上传数据'})
-      this.$emit("refresh");
+      this.$emit("refresh",this.propData);
       // this.$http({
       //   // formdata 传值方式
       //   url: "api/inspection/inspection/taskPlan/update",
@@ -524,12 +525,13 @@ export default {
       console.log(form, file,3333);
       let arr = file.name.split("_");
       let picIndex = parseInt(arr[arr.length - 2]) 
-      let ruleObj = that.ruleList.filter(obj => obj.id == form.picRenameModelId);
-      let renameList = ruleObj[0].picRenameBasicList
-      let picName = renameList.filter(row => row.picIndex == picIndex)
+      // let ruleObj = that.ruleList.filter(obj => obj.id == form.picRenameModelId);
+      // let renameList = ruleObj[0].picRenameBasicList
+      // let picName = renameList.filter(row => row.picIndex == picIndex)
       let picPath =file.relativePath.split("/")[1]+'-'+picIndex;
-      console.log(picName,11111)
-      let showName =`${form.loopName}-${form.planAreaName}-${picName.length!=0?picName[0].picName:picPath}`
+      // console.log(picName,11111)
+      // let showName =`${form.loopName}-${form.planAreaName}-${picName.length!=0?picName[0].picName:picPath}`
+      let showName =`${form.loopName}-${form.planAreaName}-${picPath}`
       console.log(showName,999999)
      // renameList.forEach(item => {
       //   if(picIndex==item.picIndex){

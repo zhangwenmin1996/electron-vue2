@@ -58,6 +58,7 @@
            <br/>
           <el-form-item >
               
+              <el-button type="primary" icon="el-icon-plus" size="small" @click="showEdit(0)">新增计划</el-button>
               <el-button type="primary" icon="el-icon-refresh" size="small" @click="syncData">拉取数据</el-button>
               <el-button type="primary" icon="el-icon-refresh" size="small" @click="delData">清空数据</el-button>
               <el-button type="primary" icon="el-icon-refresh" size="small" @click="syncTaskData">同步列表</el-button>
@@ -101,24 +102,21 @@
                   </el-tooltip>
                 </template>
               </el-table-column>
+              <el-table-column align="center" prop="loopName" label="回路名称"></el-table-column>
               <el-table-column align="center" prop="planAreaName" label="杆塔名称"></el-table-column>
               <el-table-column align="center" prop="createTime" label="创建时间" min-width="120">
                 <template slot-scope="scope">
                   <span>{{ parseTime(scope.row.createTime) }}</span>
                 </template>
               </el-table-column>
-              <el-table-column align="center" prop="updateTime" label="更新时间" min-width="120">
+              <!-- <el-table-column align="center" prop="updateTime" label="更新时间" min-width="120">
                 <template slot-scope="scope">
                   <span>{{ parseTime(scope.row.updateTime) }}</span>
                 </template>
-              </el-table-column>
-              <el-table-column align="center" prop="statusName" label="线上状态">
-                <!-- <template slot-scope="scope">
-                  <div>
-                    {{getSceneName(scope.row.scene_code)}}
-                  </div>
-                </template> -->
-              </el-table-column>
+              </el-table-column> -->
+              <!-- <el-table-column align="center" prop="statusName" label="线上状态">
+                
+              </el-table-column> -->
               <el-table-column align="center" prop="localStatus" label="本地状态">
                 <template slot-scope="scope">
                   <div>
@@ -134,7 +132,8 @@
                   <!-- </el-tooltip> -->
                   <!-- <el-tooltip class="item" effect="dark" content="标注" placement="top"> -->
                     <el-button type="text" size='medium' @click="handleTagging(scope.row)" icon="el-icon-edit-outline">标注</el-button>
-                    <el-button type="text" size='medium' @click="refreshStatus(scope.row)" icon="el-icon-refresh">更新命名</el-button>
+                    <el-button type="text" size='medium' @click="deleteItems(scope.row,1)" icon="el-icon-delete">删除</el-button>
+                    <!-- <el-button type="text" size='medium' @click="refreshStatus(scope.row)" icon="el-icon-refresh">更新命名</el-button> -->
                   <!-- </el-tooltip> -->
                 </template>
               </el-table-column>
@@ -170,7 +169,7 @@
           <template slot-scope="scope">
             <span>|- {{ scope.row.startTime }}</span
             ><br />
-            <span>|- {{ scope.row.updateTime }}</span>
+            <span>|- {{ scope.row.endTime }}</span>
           </template>
         </el-table-column>
         <el-table-column
@@ -185,13 +184,9 @@
           label="电站名称"
           min-width="160"
         >
+        
         </el-table-column>
-        <el-table-column
-          align="center"
-          prop="planTypeName"
-          label="巡检类型"
-          min-width="100"
-        ></el-table-column>
+        
         <el-table-column align="center" label="操作" width="240">
         <template slot-scope="scope">
           <el-button
@@ -209,6 +204,12 @@
            v-if="scope.row.docxUrl"
             @click="reportSee(scope.row)"
             >查看报告</el-button
+          >
+          <el-button
+           type="text" size='medium'
+     
+            @click="deleteItems(scope.row,2)"
+            >删除</el-button
           >
         </template>
       </el-table-column>
@@ -229,11 +230,23 @@
           </div>
       
     </div>
-    <line-image ref="line"  v-for="item in list" :key="item.id"  @refresh="getData"></line-image>
+    <el-dialog
+      :close-on-click-modal="false"
+      :title=" isEdit ? '修改' : '新增'"
+      :visible.sync="isShowEdit"
+      v-if="isShowEdit"
+      center
+      custom-class="box-dialog"
+      :modal-append-to-body="false"
+      width="600px"
+    >
+      <line-edit @save-ok="editOk" :data="editForm" :isEdit="isEdit"></line-edit>
+    </el-dialog>
+    <line-image ref="line"  v-for="item in list" :key="item.id"  @refresh="getDataList"></line-image>
     <!-- <line-arr ref="lineList" @refresh="getData" ></line-arr> -->
     <ailabel-add-or-update
     ref="ailabelAddOrUpdate"
-    @refresh="getData"
+    @refresh="getList"
   ></ailabel-add-or-update>
   </div>
 </template>
@@ -246,6 +259,7 @@ import fs from 'fs';
 const path = require('path');
 const { exec } = require('child_process');
 import lineImage from "./line";
+import lineEdit from "./line-edit";
 import AilabelAddOrUpdate from "./ailabelAddOrUpdate";
 import { uploadMinIo, getBase64 } from "@/api/utils";
 import { json } from 'stream/consumers';
@@ -258,7 +272,7 @@ export default {
   components: {
     AilabelAddOrUpdate,
     lineImage,
-    // lineArr,
+    lineEdit,
   },
   data() {
     return {
@@ -296,7 +310,7 @@ export default {
       isExpands: false,
       expands: [],
       getRowKeys: (row) => {
-        return row.id   
+        return row.planCode  
       },
       jsonDir: null,
       imgDir: null,
@@ -352,12 +366,54 @@ export default {
     // this.getDataList()
 	},
   methods: {
+    async deleteItems(row,index) {
+      let that = this
+      console.log(row.planCode,1111)
+      that.$confirm("此操作将永久删该数据，不可恢复, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(() => {
+        if(index==1){
+          try {
+            that.$db.dataList
+                  .where('taskPlanCode')
+                  .startsWithIgnoreCase(row.taskPlanCode)
+                  .delete();
+                  that.getDataList(row)
+                  that.$message.success('删除成功')
+          } catch (error) {
+              console.error('Failed to delete items:', error);
+          }
+        }else{
+          try {
+            
+            that.$db.planList
+                  .where('planCode')
+                  .startsWithIgnoreCase(row.planCode)
+                  .delete();
+                  that.getList()
+                  that.$message.success('删除成功')
+          } catch (error) {
+              console.error('Failed to delete items:', error);
+          }
+        }
+        
+      }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });          
+        });
+       
+    },
+
     eSelect(row){
       // this.type = row.baseType
       if (!this.isExpands) { 
         this.expands = []
         if (row) {
-          this.expands.push(row.id)
+          this.expands.push(row.planCode)
           this.getDataList(row)
         }
       } else { 
@@ -372,7 +428,7 @@ export default {
         this.expands = []
         if (row) {
           this.isExpands = true
-          this.expands.push(row.id)
+          this.expands.push(row.planCode)
           this.getDataList(row)
         }
       } else { 
@@ -471,8 +527,11 @@ export default {
 
              })
             }).catch(() => {
-                     
-            });
+              that.$message({
+                  type: 'info',
+                  message: '已取消'
+                });          
+              });
             // that.$message.success('报告生成成功！')
            
         }
@@ -557,10 +616,14 @@ export default {
       // if (this.queryParams.name==''||!this.queryParams.name) {
       //   this.getList()
       // }else{
-        
+        this.planLoading = true
         this.planList = this.filterObjectsByKeywordAndTime(this.allList,this.queryParams.name,this.queryParams.planStatusName,this.queryParams.startTime,this.queryParams.endTime)
         console.log(this.queryParams,this.planList,6663)
         this.total = this.planList.length
+        setTimeout(() => {
+          this.planLoading = false
+        }, 200);
+        
         // try {
         // // 使用 Dexie.js 的 where() 方法进行复合查询
         //   // this.list = await this.$db.dataList
@@ -607,9 +670,12 @@ export default {
         this.total = this.planList.length
     },
     async getDataList(row){
+      this.loading = true
       let data = await this.$db.dataList.where('planCode').startsWithIgnoreCase(row.planCode).toArray()
       this.list = data
-      this.loading = false
+      setTimeout(() => {
+        this.loading = false
+      }, 200);
       this.total2 = data.length
       console.log(data);
     },
@@ -768,6 +834,17 @@ export default {
           });
         }
       });
+    },
+    showEdit(isEdit) {
+      this.isEdit = isEdit;
+      this.isShowEdit = true;
+      this.editForm = {
+        
+      };
+    },
+    editOk() {
+      this.isShowEdit = false;
+      this.getList();
     },
     getRule(){
       let that = this
