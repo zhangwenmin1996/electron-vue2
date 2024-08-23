@@ -5,12 +5,12 @@ import login from '@/pages/login.vue'
 Vue.use(Router)
 
 const routes = [{
-        path: '/home',
+        path: '/',
         name: 'index',
         component: index
     },
     {
-        path: '/',
+        path: '/login',
         name: 'login',
         component: login
     },
