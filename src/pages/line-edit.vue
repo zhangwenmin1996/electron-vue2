@@ -49,8 +49,14 @@
                     />
                 </el-select> -->
             </el-form-item>
-            <el-form-item label="巡检杆塔" prop="planArea" :rules="[{ required: true, message: '请输入巡检杆塔', trigger: 'blur' }]">
-                <el-input v-model="editForm.planArea" placeholder="请输入杆塔名称多个用逗号隔开" clearable size="small"></el-input>
+            <el-form-item label="巡检杆塔" >
+                <el-input v-model="editForm.prefix" placeholder="杆塔前缀（可不填）" clearable size="small" style="width:46%"></el-input>
+                <el-input v-model="editForm.suffix" placeholder="杆塔后缀（可不填）" clearable size="small" style="width:46%;margin-left: 2%;"></el-input>
+                <br/>
+                <el-input v-model="editForm.start" placeholder="杆塔起始号（必填）" clearable size="small" style="width:46%"></el-input>
+                <el-input v-model="editForm.num" placeholder="杆塔数量（必填）" clearable size="small" style="width:46%;margin-left: 2%;"></el-input>
+                <br/>
+                <span style="color: #999;font-size: 12px;">如：创建配网2-11号的杆塔，前缀填：配网，后缀填：号，起始号为2，数量为10</span>
                 <!-- <el-select v-model="editForm.planArea" placeholder="巡检杆塔" clearable filterable multiple @change="$forceUpdate()" size="small" style="width:375px">
                     <el-option
                         v-for="(item,index) in zoneList"
@@ -184,19 +190,19 @@ props:{
         let that = this
     that.$refs.editForm.validate((valid) => {
       if(valid){
-        let planArea = that.editForm.planArea.split(",")
         let areaCodes = []
-        if(planArea.length > 1) {
-            
-        }else{
-            planArea = that.editForm.planArea.split("，")
-        }
-        planArea.forEach(element => {
+        const startNumber = parseInt(that.editForm.start);
+        const quantity = parseInt(that.editForm.num);
+        for (let i = 0; i < quantity; i++) {
+            const towerNumber = startNumber + i;
+            const towerName = `${that.editForm.prefix||''}${towerNumber}${that.editForm.suffix||''}`;
             areaCodes.push({
-                name: element,
+                name: towerName,
                 code: getUUID()
             })
-        });
+        }
+
+            
        
         let obj = {
             baseCode: getUUID(),
