@@ -135,6 +135,7 @@ export default {
   },
   created() {
     // this.getCode();
+    this.$db.open();
     this.getCookie();
     // this.getIp();
     this.getBySn()

@@ -351,7 +351,7 @@ export default {
     };
   },
   created() {
-
+    this.$db.open();
   },
 
   mounted() {
@@ -360,7 +360,7 @@ export default {
     //     filename: "/data/dataList.db"
     // })
 
-    this.$db.open();
+    
     this.getList()
    
     // this.getDataList()
