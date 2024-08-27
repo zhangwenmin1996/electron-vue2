@@ -794,8 +794,8 @@ export default {
               fault_type: '挂环R型插销退出',
             },{
               category_fault: '金具',
-              value: '螺栓垫片缺失',
-              fault_type: '螺栓垫片缺失',
+              value: '线夹螺栓垫片缺失',
+              fault_type: '线夹螺栓垫片缺失',
             },
             {
               category_fault: '金具',
@@ -809,8 +809,8 @@ export default {
             },
             {
               category_fault: '金具',
-              value: '螺栓弹簧片缺失',
-              fault_type: '螺栓弹簧片缺失',
+              value: '线夹螺栓弹簧片缺失',
+              fault_type: '线夹螺栓弹簧片缺失',
             },
             {
               category_fault: '金具',
@@ -889,13 +889,13 @@ export default {
             },
             {
               category_fault: '导地线',
-              value: '螺栓锈蚀',
-              fault_type: '螺栓锈蚀',
+              value: '电缆头螺栓锈蚀',
+              fault_type: '电缆头螺栓锈蚀',
             },
             {
               category_fault: '导地线',
-              value: '接头发热',
-              fault_type: '接头发热',
+              value: '电缆头发热',
+              fault_type: '电缆头发热',
             },
             {
               category_fault: '导地线',
@@ -999,23 +999,23 @@ export default {
             },
             {
               category_fault: '杆塔',
-              value: '螺栓缺失',
-              fault_type: '螺栓缺失',
+              value: '杆塔螺栓缺失',
+              fault_type: '杆塔螺栓缺失',
             },
             {
               category_fault: '杆塔',
-              value: '螺帽退出',
-              fault_type: '螺帽退出',
+              value: '杆塔螺帽退出',
+              fault_type: '杆塔螺帽退出',
             },
             {
               category_fault: '杆塔',
-              value: '主要受力构件松动',
-              fault_type: '主要受力构件松动',
+              value: '杆塔受力构件松动',
+              fault_type: '杆塔受力构件松动',
             },
             {
               category_fault: '杆塔',
-              value: '主要受力构件变形',
-              fault_type: '主要受力构件变形',
+              value: '杆塔受力构件变形',
+              fault_type: '杆塔受力构件变形',
             },
             {
               category_fault: '杆塔',
@@ -1054,13 +1054,13 @@ export default {
             },
             {
               category_fault: '通道环境',
-              value: '树障',
-              fault_type: '树障',
+              value: '通道存在树障',
+              fault_type: '通道存在树障',
             },
             {
               category_fault: '通道环境',
-              value: '通道异物',
-              fault_type: '通道异物',
+              value: '通道存在异物',
+              fault_type: '通道存在异物',
             },
           ]
           let list = []
