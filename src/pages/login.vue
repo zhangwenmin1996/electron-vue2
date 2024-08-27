@@ -7,14 +7,14 @@
 </template>
 
 <script>
-import config from "./config";
+// import config from "./config";
 const os = require('os');
 const { execSync } = require('child_process');
 export default {
   name: "login",
-  components: {
-    config,
-  },
+  // components: {
+  //   config,
+  // },
   data() {
     return {
       codeUrl: "",

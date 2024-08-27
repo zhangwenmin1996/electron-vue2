@@ -928,7 +928,7 @@ export default {
     },
     logOut(){
       sessionStorage.clear()
-      this.$router.push("/login")
+      this.$router.push("/")
     },
     handleSizeChange(val) {
       console.log(`每页 ${val} 条`);
