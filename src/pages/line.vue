@@ -523,14 +523,14 @@ export default {
     setFolder(form, file) {
       let that = this;
       console.log(form, file,3333);
-      let arr = file.name.split("_");
-      let picIndex = parseInt(arr[arr.length - 2]) 
-      // let ruleObj = that.ruleList.filter(obj => obj.id == form.picRenameModelId);
-      // let renameList = ruleObj[0].picRenameBasicList
-      // let picName = renameList.filter(row => row.picIndex == picIndex)
-      let picPath =file.relativePath.split("/")[1]+'-'+picIndex;
+      let pathArr = file.relativePath.split("/")
+      let nameArr = file.name.split('_')
+      let picIndex = parseInt(nameArr[nameArr.length - 2]) 
       // console.log(picName,11111)
+      let picPath = file.name.replace(/#/g, "")
       // let showName =`${form.loopName}-${form.planAreaName}-${picName.length!=0?picName[0].picName:picPath}`
+      picPath = pathArr[pathArr.length-3]+'/'+pathArr[pathArr.length-2]+'_'+
+        nameArr[nameArr.length-2]+'_'+nameArr[nameArr.length-1]
       let showName =`${form.loopName}-${form.planAreaName}-${picPath}`
       console.log(showName,999999)
      // renameList.forEach(item => {
@@ -543,7 +543,7 @@ export default {
         taskPlanCode: form.line_task_id,
         planArea: form.line_id,
         name: file.name,
-        showName: file.name,
+        showName: showName,
         isSync: 0,
         picIndex: picIndex,
       }
