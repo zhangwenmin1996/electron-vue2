@@ -2573,7 +2573,7 @@ export default {
           obj = {
             file_name: this.originForm.file_name,
             show_name: this.form.label,
-            img_position: this.form.img_position,
+            img_position: this.form.img_position || "",
             wtg_plant_id: this.originForm.wtg_plant_id,
             trail: JSON.stringify(element.trail) || "",
             important: 1,
@@ -2584,11 +2584,11 @@ export default {
             // wtg_task_image_id: this.originForm.wtg_task_image_id,
             task_id: this.originForm.task_id,
             fault_type_code: element.fault_type,
-            fault_type_name: element.fault_type_name,
+            fault_type_name: element.fault_type_name || "",
             fault_info: element.fault_info,
             fault_level: element.fault_level,
             category_fault: element.category_fault,
-            category_name: element.category_name,
+            category_name: element.category_name || "",
             handling_suggestions: element.handling_suggestions,
             fault_location: [
               Math.round(element["points"].x) ,
@@ -2618,7 +2618,7 @@ export default {
           obj = {
             file_name:  this.originForm.file_name,
             show_name: this.form.label,
-            img_position: this.form.img_position,
+            img_position: this.form.img_position || "",
             trail: JSON.stringify(element.trail) || "",
             folder_name: this.originForm.folder_name,
             wtg_plant_id: this.originForm.wtg_plant_id,
@@ -2632,7 +2632,7 @@ export default {
             fault_info: element.fault_info,
             fault_level: element.fault_level,
             category_fault: element.category_fault,
-            category_name: element.category_name,
+            category_name: element.category_name || "",
             handling_suggestions: element.handling_suggestions,
             important: 1,
             fault_location: [

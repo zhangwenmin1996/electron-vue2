@@ -312,7 +312,7 @@ export default {
     border-radius: 8px;
     &:hover{
       background: linear-gradient(180deg, rgba(47, 103, 161, 0.4) 0%, #2F67A1 100%);
-      color: #01C19A;
+      color: #fff;
       cursor: pointer;
     }
   }
