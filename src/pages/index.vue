@@ -42,7 +42,7 @@
           <el-form-item >
               <el-button type="primary" icon="el-icon-search" size="small" @click="search">搜索</el-button>
               <el-button type="primary" icon="el-icon-refresh" size="small" @click="resetQuery">重置</el-button>
-              <el-button type="primary" icon="el-icon-refresh" size="small" @click="logOut">返回首页</el-button>
+              <el-button type="primary" size="small" @click="logOut">返回首页</el-button>
             </el-form-item>
         
           <!-- <el-form-item label="场景类型" prop="status">
@@ -60,7 +60,7 @@
               
               <el-button type="primary" icon="el-icon-plus" size="small" @click="showEdit(0)">新增计划</el-button>
               <!-- <el-button type="primary" icon="el-icon-refresh" size="small" @click="syncData">拉取数据</el-button> -->
-              <el-button type="primary" icon="el-icon-right" size="small" @click="delData">清空数据</el-button>
+              <el-button type="primary" icon="el-icon-delete" size="small" @click="delData">清空数据</el-button>
               <!-- <el-button type="primary" icon="el-icon-refresh" size="small" @click="syncTaskData">同步列表</el-button>
               <el-button type="primary" icon="el-icon-refresh" size="small" @click="syncLineData">同步故障</el-button>
               <el-button type="primary" icon="el-icon-refresh" size="small" @click="syncImgData">同步图片</el-button> -->

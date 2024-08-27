@@ -294,7 +294,7 @@ export default {
   position: relative;
   width: 100vw;
   height: 100vh;
-  background: url("../assets/login/bg.png") center ;
+  background: url("../assets/login/bg.png") center no-repeat;
   background-size: 100%;
   overflow: hidden;
   .noLogin{
