@@ -2495,12 +2495,18 @@ export default {
       //   data: val,
       // }).then((data) => {
       //   if (data && data.code === 1000) {
-          this.$message.success("该图片标注信息保存成功");
+          
       //     // this.getData(this.taskId)
           if (this.isnext === "next") {
+            this.$message.success("该图片标注信息保存成功");
             this.nextImg();
           }else if(this.isnext === "prev"){
+            this.$message.success("该图片标注信息保存成功");
             this.prevImg();
+          }else if(this.isnext == "del"){
+            this.$message.success("删除标注成功！");
+          }else{
+            this.$message.success("该图片标注信息保存成功");
           }
       //   } else {
       //   }
@@ -2550,7 +2556,7 @@ export default {
         imgSrc.naturalHeight,
         imgHeight
       );
-      if (this.formArr.length<1) {
+      if (this.formArr.length<1&&this.isnext!='del') {
           that.$message.warning("请标注故障!");
           return false;
         }
@@ -3632,7 +3638,6 @@ export default {
       this.formArr.splice(deleteindex, 1);
       this.arrIndex = this.formArr.length - 1;
       this.next = "";
-      this.$message.success("删除标注成功！");
       if (this.formArr.length > 0) {
         this.form = JSON.parse(
           JSON.stringify(this.formArr[this.formArr.length - 1])
@@ -3650,7 +3655,7 @@ export default {
       }
       // console.log("this.formArr", this.formArr);
       // console.log("this.RectList", this.RectList);
-      // this.updateText();
+      this.updateText('del');
     },
     // 根据文字标注id，获取文字标注所属矩形id
     getText(id) {
