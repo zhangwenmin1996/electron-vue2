@@ -34,6 +34,7 @@
                 slot-scope="item, index"
                 :class="imgIndex === index ? 'activeList' : 'defaultList'"
                 @click="changeImage(item, index)"
+                style="width: 100%;"
               >
                 <a
                   slot="actions"
@@ -3841,6 +3842,16 @@ export default {
     margin-top: 10px;
     padding: 5px;
     overflow: auto;
+    >>>.ant-list {
+      width: 100% !important;
+      >>>.ant-spin-nested-loading{
+        width: 100% !important;
+        >>>.ant-spin-container{
+          width: 100% !important;
+        }
+      }
+      
+    }
   }
 }
 .card-content {
@@ -3939,4 +3950,10 @@ list-style-type: none !important;
 .ant-form-item {
   margin-bottom: 10px;
 }
+</style>
+<style lang="scss">
+.ant-spin-container{
+  width: 100% !important;
+}
+     
 </style>
