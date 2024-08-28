@@ -839,7 +839,7 @@ export default {
       this.isEdit = isEdit;
       this.isShowEdit = true;
       this.editForm = {
-        
+        companyName: '中广核新能源湖北分公司'
       };
     },
     editOk() {
