@@ -530,7 +530,7 @@ export default {
       let picPath = file.name.replace(/#/g, "")
       // let showName =`${form.loopName}-${form.planAreaName}-${picName.length!=0?picName[0].picName:picPath}`
       picPath = pathArr[pathArr.length-3]+'/'+pathArr[pathArr.length-2]+'_'+
-        nameArr[nameArr.length-2]+'_'+nameArr[nameArr.length-1]
+        nameArr[nameArr.length-2]
       let showName =`${form.loopName}-${form.planAreaName}-${picPath}`
       console.log(showName,999999)
      // renameList.forEach(item => {

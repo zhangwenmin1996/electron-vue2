@@ -246,7 +246,7 @@
     <!-- <line-arr ref="lineList" @refresh="getData" ></line-arr> -->
     <ailabel-add-or-update
     ref="ailabelAddOrUpdate"
-    @refresh="getList"
+    @refresh="getDataList"
   ></ailabel-add-or-update>
   </div>
 </template>

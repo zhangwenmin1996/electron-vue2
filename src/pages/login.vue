@@ -68,6 +68,7 @@ export default {
     },
     offLine(){
       let time = this.time
+      this.$db.open();
       const storedDate = new Date(time);
       const currentDate = new Date();
       const differenceInMilliseconds = currentDate - storedDate;

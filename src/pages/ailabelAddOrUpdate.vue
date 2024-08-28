@@ -22,11 +22,12 @@
         <!-- <el-row type="flex" justify="space-between" class="content-row"> -->
         <!-- 树 -->
         <!-- <el-col :span="4"> -->
-        <div class="content-row">
+        <div class="content-row" @mousemove="isResizer=true" @mouseleave="isResizer=false" >
+          <div class="resizer" v-if="isResizer" @mousedown="startResizing"></div>
           <div class="tree-header">
-            <span class="bot"></span><span>故障列表</span>
+            <div class="header-title"> <span class="bot"></span><span>故障列表</span></div> 
           </div>
-          <div class="tree-content">
+          <div class="tree-content" :style="{ width: boxWidth + 'px' }" ref="resizableBox">
             <a-list item-layout="horizontal" :data-source="imgsrcNowList">
               <a-list-item
                 slot="renderItem"
@@ -65,7 +66,7 @@
           <div class="card-content">
             <div class="img-info">
               <div>
-                <label>区域名称：</label>
+                <label>杆塔名称：</label>
                 <label v-text="wtgName" readonly="readonly"></label>
               </div>
               <div>
@@ -253,7 +254,7 @@
                   @click="backailabel()"
                   size="small"
                 >
-                  审核完成
+                  标注完成
                 </el-button>
               </el-form-item>
             </el-form>
@@ -298,6 +299,7 @@ export default {
   data() {
     return {
       visible: false,
+      isResizer: false,
       confirmLoading: false,
       expandedKeys: [],
       formLabelWidth: "80px",
@@ -442,6 +444,10 @@ export default {
               value: '通道环境',
               label: '通道环境',
             }, 
+            {
+              value: '下塔电缆',
+              label: '下塔电缆',
+            }
           ]
         },
         {
@@ -472,10 +478,17 @@ export default {
               value: '通道环境',
               label: '通道环境',
             }, 
+            {
+              value: '下塔电缆',
+              label: '下塔电缆',
+            }
           ]
         },
       ],
       tempInput: '',
+      formObj: {},
+      isResizing: false,
+      boxWidth: 360, 
     };
   },
   components: {
@@ -539,6 +552,26 @@ export default {
         that.updateText('prev')
       }
     },
+    startResizing(e) {
+      this.isResizing = true;
+      document.addEventListener('mousemove', this.resizeBox);
+      document.addEventListener('mouseup', this.stopResizing);
+    },
+    resizeBox(e) {
+      if (!this.isResizing) return;
+
+      const containerRect = this.$refs.resizableBox.parentNode.getBoundingClientRect();
+      const newWidth = e.clientX - containerRect.left;
+
+      if (newWidth > 260) {
+        this.boxWidth = newWidth;
+      }
+    },
+    stopResizing() {
+      this.isResizing = false;
+      document.removeEventListener('mousemove', this.resizeBox);
+      document.removeEventListener('mouseup', this.stopResizing);
+    },
     async getDict() { // 修改  formdata传值方式
      
       this.fjpositionList = [
@@ -596,6 +629,7 @@ export default {
     },
     handleBlur(val){
       console.log(val,5555)
+      this.form.img_position = val
       let that = this
       let inputValue = val
       if (inputValue) {
@@ -608,9 +642,10 @@ export default {
             label: inputValue,
           };
           that.options.push(newOption);
-          that.form.img_position = [newOption.value];
+          that.form.img_position = newOption.value;
         }
       }
+      
     },
     changePoptions(val) {
       if (val) {
@@ -623,6 +658,7 @@ export default {
     //   初始化标注组件
     init(val) {
       this.version = 1;
+      this.formObj = val
       this.showType = val.type
       this.title = val.baseCodeName + "分析结果审核";
       this.taskId = val.taskPlanCode;
@@ -1603,7 +1639,7 @@ export default {
       this.imgsrcNowList = [];
       this.imgsrcNow = "";
       this.imgIndex = 0;
-      this.$emit("refresh");
+      this.$emit("refresh",this.formObj);
     },
     ///////////////////////////////////////////////////////////////////////////////////////
     // 初始化标注组件
@@ -2419,7 +2455,10 @@ export default {
       //   })
       //   .then((data) => {
       //     if (data && data.status == 200) {
-      //       that.$message.success("标注成功");
+            that.$message.success("标注完成！");
+            let id = that.taskNum
+            that.$db.dataList.update(id,{status:10,isSync: 0,statusName: '已完成标注',localStatus: '已完成标注'})
+            that.$emit("refresh",this.formObj);
       //       that.handleCancel();
       //     }
       //   });
@@ -2511,16 +2550,28 @@ export default {
         imgSrc.naturalHeight,
         imgHeight
       );
-
+      if (this.formArr.length<1) {
+          that.$message.warning("请标注故障!");
+          return false;
+        }
       for (let index = 0; index < this.formArr.length; index++) {
         const element = this.formArr[index];
         console.log(element,index,333)
         // errorNum = errorNum - 0 + (element.errorNum - 0);
         let obj;
-        // if (!element.fault_type || element.fault_type == "fault") {
-        //   that.$message.warning("请选择故障类型!");
-        //   return false;
-        // }
+       
+        if (!element.fjposition || element.fjposition == "") {
+          that.$message.warning("请选择故障位置!");
+          return false;
+        }
+        if (!element.fault_type || element.fault_type == "fault") {
+          that.$message.warning("请选择故障类型!");
+          return false;
+        }
+        if (!element.fault_level || element.fault_type == "") {
+          that.$message.warning("请选择故障等级!");
+          return false;
+        }
         // element.fault_info = that.faultArray.filter((item) => {
         //   return item.value === element.fault_type;
         // })[0].fault_info;
@@ -2583,13 +2634,13 @@ export default {
              planAreaName: this.wtgName,
             // wtg_task_image_id: this.originForm.wtg_task_image_id,
             task_id: this.originForm.task_id,
-            fault_type_code: element.fault_type,
+            fault_type_code: element.fault_type || "",
             fault_type_name: element.fault_type_name || "",
-            fault_info: element.fault_info,
-            fault_level: element.fault_level,
-            category_fault: element.category_fault,
+            fault_info: element.fault_info || "",
+            fault_level: element.fault_level || "",
+            category_fault: element.category_fault || "",
             category_name: element.category_name || "",
-            handling_suggestions: element.handling_suggestions,
+            handling_suggestions: element.handling_suggestions || "",
             fault_location: [
               Math.round(element["points"].x) ,
               Math.round(element["points"].y) ,
@@ -2628,12 +2679,12 @@ export default {
             station_id: this.wtg_plant_id,
             // wtg_task_image_id: this.originForm.wtg_task_image_id,
             task_id: this.originForm.task_id,
-            fault_type_code: element.fault_type,
-            fault_info: element.fault_info,
-            fault_level: element.fault_level,
-            category_fault: element.category_fault,
+            fault_type_code: element.fault_type || "",
+            fault_info: element.fault_info || "",
+            fault_level: element.fault_level || "",
+            category_fault: element.category_fault || "",
             category_name: element.category_name || "",
-            handling_suggestions: element.handling_suggestions,
+            handling_suggestions: element.handling_suggestions || "",
             important: 1,
             fault_location: [
               element.xy[0],
@@ -3729,6 +3780,7 @@ export default {
   display: flex;
   overflow: hidden;
   .content-row {
+    position: relative;
     min-width: 260px;
     display: flex;
     flex-direction: column;
@@ -3736,14 +3788,38 @@ export default {
     // padding: 5px;
     overflow: hidden;
     background: #1f2d3d;
+    .resizer {
+      position: absolute;
+      right: 0;
+      width: 5px;
+      height: 100%;
+      background-color: #ccc;
+      cursor: ew-resize;
+    }
     .tree-header {
       font-size: 14px;
       box-sizing: border-box;
-      padding: 10px 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       font-family: Microsoft YaHei, Microsoft YaHei-Regular;
       font-weight: 400;
       color: #fff;
       border-bottom: 1px solid #999999;
+      .header-title{
+        padding: 5px 10px;
+        display: flex;
+        align-items: center;
+        .bot {
+          display: inline-block;
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          border: 2px #f00 solid;
+          margin: 0 5px 0 10px;
+        }
+      }
+      
     }
   }
 
@@ -3797,14 +3873,7 @@ export default {
   position: relative;
   cursor: pointer;
 }
-.bot {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  border: 2px #f00 solid;
-  margin: 0 5px 0 10px;
-}
+
 .box-right {
   display: flex;
   flex-direction: column;
