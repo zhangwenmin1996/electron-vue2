@@ -74,7 +74,7 @@ export default {
       const differenceInMilliseconds = currentDate - storedDate;
       const differenceInDays = differenceInMilliseconds / (1000 * 60 * 60 * 24);
       if (differenceInDays > 15) {
-        this.$message.warning("距离上次授权登录已超过15天，请重新登录");
+        this.getBySn()
       } else {
         this.$router.push('/home')
       }
