@@ -106,7 +106,7 @@ export default {
           method: "post",
           params: {
             deviceSn: sn,
-            softwareKey: 'inspection-pc'
+            softwareKey: 'draw-pc'
           },
         }).then((data) => {
           if (data && data.status == 200) {
@@ -159,7 +159,7 @@ export default {
         method: "post",
         data: {
           deviceSn: sn,
-          softwareKey: 'inspection-pc',
+          softwareKey: 'draw-pc',
           activationCode: value,
           deviceModel: 'PC端'
         },
@@ -170,14 +170,14 @@ export default {
           that.isSN = true
           localStorage.setItem('time',that.parseTime(new Date()))
           that.time = that.parseTime(new Date())
-          that.$confirm ('是否进入离线使用', '提示', {
-              confirmButtonText: '确定',
-              cancelButtonText: '取消',
-            }).then(() => {
+          // that.$confirm ('是否进入离线使用', '提示', {
+          //     confirmButtonText: '确定',
+          //     cancelButtonText: '取消',
+          //   }).then(() => {
              that.$router.push("/home")
-            }).catch(() => {
+            // }).catch(() => {
                    
-            });
+            // });
           // that.$router.push("/home").catch(() => {
             
           // });
@@ -295,7 +295,7 @@ export default {
   position: relative;
   width: 100vw;
   height: 100vh;
-  background: url("../assets/login/bg.png") center no-repeat;
+  background: url("../assets/login/bg2.png") center no-repeat;
   background-size: 100%;
   overflow: hidden;
   .noLogin{
