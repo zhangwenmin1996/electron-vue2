@@ -1929,7 +1929,7 @@ export default {
         }else{
           const decodedData = iconv.decode(stdout, 'gbk');
           const [length, width] = decodedData.split(' ');
-          let label = `长：${length}m，宽：${width}m`;
+          let label = `W：${length}m，H：${width}m`;
           that.setText(that.form.points,that.form,label)
           console.log(decodedData,6666)
           console.log(stderr,7777)
@@ -2000,7 +2000,7 @@ export default {
           "text" + timestamp,
           {
             position: { x: xy.x, y: xy.y },
-            offset: { x: 0, y: 0 },
+            offset: { x: 0, y: -2 },
             maxWidth: 100,
             text: label,
             data: {
