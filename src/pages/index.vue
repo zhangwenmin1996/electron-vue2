@@ -34,11 +34,28 @@
           <div class="card-content">
             <div class="img-info">
               <div>
-                <label>杆塔名称：</label>
-                <label v-text="wtgName" readonly="readonly"></label>
+                <uploader
+                ref="uploader"
+                :options="options"
+                :autoStart="false"
+                @files-added="onFilesAdded"
+                @file-added="onFileAdded"
+                class="uploader-app"
+              >
+                <!-- <uploader-unsupport></uploader-unsupport> -->
+
+                <!-- <uploader-btn id="global-uploader-btn" :attrs="attrs" ref="uploadBtn">选择文件</uploader-btn> -->
+                <uploader-btn
+                  :directory="true"
+                  id="global-uploader-btn2"
+                  ref="uploadBtn2"
+                  >读取文件夹</uploader-btn
+                >
+              </uploader>
               </div>
+              <el-button type="primary" size="small" @click="logOut">返回首页</el-button>
               <div>
-                <el-button
+                <!-- <el-button
                   @click="
                     setMode('DRAWMASK');
                     btnIndex = 3;
@@ -46,7 +63,7 @@
                   size="small"
                   :type="btnIndex == 3 ? 'primary' : ''"
                   >涂抹</el-button
-                >
+                > -->
                 <!-- <el-button
                   @click="
                     setMode('CLEARMASK');
@@ -63,7 +80,7 @@
                   "
                   size="small"
                   :type="btnIndex == 1 ? 'primary' : ''"
-                  >标记故障</el-button
+                  >矩形框测量</el-button
                 >
                 <el-button
                   @click="clearMask()"
@@ -98,157 +115,26 @@
             </div>
           </div>
         </div>
-        <div class="box-right">
-          <!-- <div
-            class="globalImageBox"
-            style="border: 1px solid; width: 100%"
-            :height="gloHeight"
-          >
-            <global-box
-              ref="globalBox2"
-              @getGlobalDate="getGlobalDate"
-            ></global-box>
-          </div> -->
-          <el-card class="box-card">
-            <div class="tree-header">
-              <span class="bot"></span><span>故障信息</span>
-            </div>
-            <el-form class="box-form" :model="form">
-              <el-form-item label="图片名称" :label-width="formLabelWidth">
-                  <el-input type="textarea" :rows="2" v-model="form.label" style="width: 100%"/>
-              </el-form-item>
-              <el-form-item label="图片位置" :label-width="formLabelWidth">
-                <!-- <el-input size="small" v-model="form.img_position" @change="changeSelect" laceholder="请输入图片位置"/> -->
-                <el-cascader :options="options" v-model="form.img_position" @change="changePoptions" :show-all-levels="false" filterable clearable :before-filter="handleBlur"></el-cascader>
-              </el-form-item>
-              <el-form-item label="故障位置" :label-width="formLabelWidth">
-                <!-- <el-input size="small" v-model="form.fjposition" @change="changeSelect" laceholder="请输入故障位置"/> -->
-                <el-select
-                  v-model="form.fjposition"
-                  @change="changePosition"
-                  filterable allow-create default-first-option 
-                  placeholder="请选择故障位置"
-                  size="small"
-                  style="width: 100%"
-                >
-                  <el-option
-                    v-for="(item, index) in fjpositionList"
-                    :key="index"
-                     :value="item.name"
-                    :label="item.name"
-                  >
-                  </el-option>
-                </el-select>
-               </el-form-item>
-                <el-form-item label="故障类型" :label-width="formLabelWidth">
-                  <!-- <el-input size="small" v-model="form.fault_type" @change="changeSelect" laceholder="请输入故障类型"/> -->
-                <el-select
-                  v-model="form.fault_type"
-                  size="small"
-                  :showSearch="true"
-                  @change="changeSelect"
-                  filterable allow-create default-first-option 
-                  placeholder="请选择故障类型"
-                  style="width: 100%"
-                >
-                  <el-option
-                    v-for="(item, index) in faultTypeArray"
-                    :key="index"
-                    :value="item.value"
-                    :label="item.fault_type"
-                  >
-                  </el-option>
-                </el-select>
-              </el-form-item>
-              
-              <!-- <el-form-item label="图片编号">
-                              <el-input v-model="form.label" />
-                            </el-form-item> -->
-             
-              <el-form-item label="故障等级" :label-width="formLabelWidth">
-                <!-- <el-input v-model="form.fault_level" size="small"  /> -->
-                <el-select v-model="form.fault_level" filterable allow-create default-first-option @change="changeSelect">
-                  <el-option
-                    v-for="(item, index) in ['一般','重要','危急']"
-                    :key="index"
-                    :label="item"
-                    :value="item"
-                  ></el-option>
-                </el-select>
-              </el-form-item>
-              <el-form-item label="处理建议" :label-width="formLabelWidth">
-                <el-input
-                  v-model="form.handling_suggestions"
-                  type="textarea"
-                  :rows="2"
-                  size="small"
-                  @change="changeSelect"
-                />
-              </el-form-item>
-              <el-form-item label="故障数量" :label-width="formLabelWidth">
-                <el-input size="small" :value="formArr.length" readonly />
-              </el-form-item>
-              <!-- <el-form-item label="进度" :label-width="formLabelWidth">
-                                <a-progress
-                                  :percent="progress"
-                                />
-                                <el-progress :percentage="progress"></el-progress>
-                              </el-form-item> -->
-              <el-form-item style="text-align: center">
-                <el-button
-                  style="margin-right: 10px"
-                  type="primary"
-                  @click="updateText('save')"
-                  :loading="saveLoading"
-                  size="small"
-                >
-                  保存
-                </el-button>
-                <!-- <el-button @click="huixian">标注回显</el-button> -->
-                <el-button
-                  style="margin-right: 10px"
-                  type="primary"
-                  @click="updateText('next')"
-                  :loading="saveLoading"
-                  size="small"
-                >
-                  保存并且下一张
-                </el-button>
-                <!-- <el-button style="margin-right: 10px" type="danger"
-                                >清空</el-button
-                              > -->
-                <el-button
-                  type="primary"
-                  @click="backailabel()"
-                  size="small"
-                >
-                  标注完成
-                </el-button>
-              </el-form-item>
-            </el-form>
-          </el-card>
-        </div>
+       
       </div>
   </div>
 </template>
  
 <script>
 import Vue from "vue";
+import { ipcRenderer } from 'electron';
+import fs from 'fs';
+const { exec } = require('child_process');
 const path = require('path');
-// import GlobalBox from "./global";
-// import { myMixin } from "./defect";
-// import { getImage } from "@/utils/upload";
 import { List, Card, Progress } from "ant-design-vue";
 Vue.use(List);
 import deleteIcon from "@/assets/delete.png";
 let AILabel = require("./js/index");
 // import "./js/index";
 import { debouce1 } from "./js/debounce";
-let requestDB = null;
-var db;
+
 let gTextLayer2 = null;
-let imgDB = null;
-let imgdb = null;
+
 let that;
 let drawingStyle; // 绘制样式
 let gMap; // 标注容器
@@ -265,7 +151,38 @@ export default {
   // mixins: [myMixin],
   data() {
     return {
-      visible: false,
+      options: {
+        // target: '/api-formal/wtg/api/v1/wtg_image_save/',
+        target: "#",
+        testMethod: "PUT",
+        uploadMethod: "PUT",
+        chunkSize: "20480000000",
+        fileParameterName: "file",
+        simultaneousUploads: 1,
+        maxChunkRetries: 3,
+        testChunks: false, //是否开启服务器分片校验
+        // // 服务器分片校验函数，秒传及断点续传基础
+
+        parseTimeRemaining: function (timeRemaining, parsedTimeRemaining) {
+          // console.log(timeRemaining,parsedTimeRemaining,321321)
+          return parsedTimeRemaining
+            .replace(/\syears?/, "年")
+            .replace(/\days?/, "天")
+            .replace(/\shours?/, "小时")
+            .replace(/\sminutes?/, "分钟")
+            .replace(/\sseconds?/, "秒");
+        },
+        processParams(params) {
+          //每一次分片传给后台的参数，params是该方法返回的形参，包含分片信息
+          console.log(params, 11122);
+          return {};
+        },
+        headers: {
+          "Content-Type": " application/x-www-form-urlencoded",
+        },
+        query() {},
+      },
+      imgData: {},
       isResizer: false,
       confirmLoading: false,
       expandedKeys: [],
@@ -321,20 +238,7 @@ export default {
       // progress: 0,
       form: {
         id: "",
-        type: "",
-        taskId: "",
-        subtask_id: "",
-        errorNum: 1,
         label: "",
-        labelId: "",
-        fault_type: "1",
-        wtg_id: "",
-        ypId: "",
-        fjposition: "",
-        handling_suggestions: "",
-        fault_level: "",
-        important: true,
-        fea: {},
       },
       formArr: [],
       subtask_id: "",
@@ -370,92 +274,11 @@ export default {
       rleData: [], // 最终图像标记
       curMode: 1, // 当前图形类型
       curtext: "",
-      options: [
-        {
-          value: '同塔双回',
-          label: '同塔双回',
-          children: [
-              {
-              value: '塔全貌',
-              label: '塔全貌',
-            }, 
-            {
-              value: '左上相',
-              label: '左上相',
-            }, 
-            {
-              value: '左中相',
-              label: '左中相',
-            }, 
-            {
-              value: '左下相',
-              label: '左下相',
-            },
-            {
-              value: '右上相',
-              label: '右上相',
-            }, 
-            {
-              value: '右中相',
-              label: '右中相',
-            },
-            {
-              value: '右下相',
-              label: '右下相',
-            },
-            {
-              value: '地线',
-              label: '地线',
-            }, 
-            {
-              value: '通道环境',
-              label: '通道环境',
-            }, 
-            {
-              value: '下塔电缆',
-              label: '下塔电缆',
-            }
-          ]
-        },
-        {
-          value: '单回杆塔',
-          label: '单回杆塔',
-          children: [
-            {
-              value: '塔全貌',
-              label: '塔全貌',
-            }, 
-            {
-              value: '左相',
-              label: '左相',
-            }, 
-            {
-              value: '中相',
-              label: '中相',
-            }, 
-            {
-              value: '右相',
-              label: '右相',
-            }, 
-            {
-              value: '地线',
-              label: '地线',
-            }, 
-            {
-              value: '通道环境',
-              label: '通道环境',
-            }, 
-            {
-              value: '下塔电缆',
-              label: '下塔电缆',
-            }
-          ]
-        },
-      ],
       tempInput: '',
       formObj: {},
       isResizing: false,
       boxWidth: 360, 
+      imgPoints: '',
     };
   },
   components: {
@@ -466,16 +289,7 @@ export default {
   //监听属性 类似于data概念
   computed: {
     // 标注进度
-    progress: function () {
-      let num = 0;
-      for (let index = 0; index < this.imgsrcNowList.length; index++) {
-        const element = this.imgsrcNowList[index];
-        if (element.imagefault_type !== "未知") {
-          num++;
-        }
-      }
-      return Math.floor((num / this.imgsrcNowList.length) * 100);
-    },
+    
   },
   //监控data中的数据变化
   watch: {
@@ -510,6 +324,30 @@ export default {
   activated() {}, //如果页面有keep-alive缓存功能，这个函数会触发
   //方法集合
   methods: {
+    onFilesAdded(file, fileList) {
+      console.log(file,fileList,2222)
+      let arr = []
+      file.forEach(item => {
+        arr.push({
+          label: item.name,
+          file_link: item.file.path,
+          file: item.file
+        })
+      });
+      this.imgsrcNowList = arr
+      this.changeImage(this.imgsrcNowList[0], this.imgIndex);
+      console.log(arr,6666)
+    },
+    onFileAdded(file, fileList) {
+     
+      // console.log(file,fileList,111111)
+      
+     
+    },
+    logOut(){
+      sessionStorage.clear()
+      this.$router.push("/")
+    },
     startResizing(e) {
       this.isResizing = true;
       document.addEventListener('mousemove', this.resizeBox);
@@ -594,10 +432,6 @@ export default {
       this.visible = true;
       this.spinning = false;
       this.wtgName = val.planAreaName;
-      requestDB = null;
-      db;
-      imgDB = null;
-      imgdb = null;
       gMap = null;
       gImageLayer = null;
       gFirstMaskLayer = null;
@@ -620,415 +454,9 @@ export default {
       let name = val.planArea+'/'+val.taskPlanCode
       this.getDict()
       this.getData(val.taskPlanCode,name)
-      this.getErrorType()
       // this.initimgDB();
     },
-    async getErrorType(type) {
    
-          let data = [
-            {
-              category_fault: '绝缘子',
-              value: '绝缘子串球头侧R型插销退出',
-              fault_type: '绝缘子串球头侧R型插销退出',
-            },
-            {
-              category_fault: '绝缘子',
-              value: '绝缘子串球头侧R型插销缺失',
-              fault_type: '绝缘子串球头侧R型插销缺失',
-            },
-            {
-              category_fault: '绝缘子',
-              value: '绝缘子串碗头侧R型插销退出',
-              fault_type: '绝缘子串碗头侧R型插销退出',
-            },
-            {
-              category_fault: '绝缘子',
-              value: '绝缘子串碗头侧R型插销缺失',
-              fault_type: '绝缘子串碗头侧R型插销缺失',
-            },
-            {
-              category_fault: '绝缘子',
-              value: '绝缘子脏污',
-              fault_type: '绝缘子脏污',
-            },
-            {
-              category_fault: '绝缘子',
-              value: '绝缘子裂纹',
-              fault_type: '绝缘子裂纹',
-            },
-            {
-              category_fault: '绝缘子',
-              value: '绝缘子自爆',
-              fault_type: '绝缘子自爆',
-            },
-            {
-              category_fault: '绝缘子',
-              value: '绝缘子破损',
-              fault_type: '绝缘子破损',
-            },
-            {
-              category_fault: '绝缘子',
-              value: '绝缘子串有雷击痕迹',
-              fault_type: '绝缘子串有雷击痕迹',
-            },
-            {
-              category_fault: '绝缘子',
-              value: '绝缘子串有拉弧放电痕迹',
-              fault_type: '绝缘子串有拉弧放电痕迹',
-            },
-            {
-              category_fault: '绝缘子',
-              value: '支撑绝缘子绑扎不规范',
-              fault_type: '支撑绝缘子绑扎不规范',
-            },
-            {
-              category_fault: '绝缘子',
-              value: '支撑绝缘子松动',
-              fault_type: '支撑绝缘子松动',
-            },
-            {
-              category_fault: '绝缘子',
-              value: '支撑绝缘子倾斜',
-              fault_type: '支撑绝缘子倾斜',
-            },
-            {
-              category_fault: '绝缘子',
-              value: '绝缘子球头锈蚀',
-              fault_type: '绝缘子球头锈蚀',
-            },
-            {
-              category_fault: '绝缘子',
-              value: '绝缘子碗头锈蚀',
-              fault_type: '绝缘子碗头锈蚀',
-            },
-            {
-              category_fault: '绝缘子',
-              value: '绝缘子串上有异物',
-              fault_type: '绝缘子串上有异物',
-            },
-            {
-              category_fault: '绝缘子',
-              value: '绝缘子防污帽松动',
-              fault_type: '绝缘子防污帽松动',
-            },
-            {
-              category_fault: '绝缘子',
-              value: '均压环移位',
-              fault_type: '均压环移位',
-            },
-            {
-              category_fault: '金具',
-              value: '联板R型插销缺失',
-              fault_type: '联板R型插销缺失',
-            },
-            {
-              category_fault: '金具',
-              value: '联板R型插销退出',
-              fault_type: '联板R型插销退出',
-            },
-            {
-              category_fault: '金具',
-              value: '联板螺母缺失',
-              fault_type: '联板螺母缺失',
-            },
-            {
-              category_fault: '金具',
-              value: '联板螺母退出',
-              fault_type: '联板螺母退出',
-            },
-            {
-              category_fault: '金具',
-              value: '挂环R型插销缺失',
-              fault_type: '挂环R型插销缺失',
-            },
-            {
-              category_fault: '金具',
-              value: '挂环R型插销退出',
-              fault_type: '挂环R型插销退出',
-            },{
-              category_fault: '金具',
-              value: '线夹螺栓垫片缺失',
-              fault_type: '线夹螺栓垫片缺失',
-            },
-            {
-              category_fault: '金具',
-              value: '挂环螺母缺失',
-              fault_type: '挂环螺母缺失',
-            },
-            {
-              category_fault: '金具',
-              value: '挂环螺母退出',
-              fault_type: '挂环螺母退出',
-            },
-            {
-              category_fault: '金具',
-              value: '线夹螺栓弹簧片缺失',
-              fault_type: '线夹螺栓弹簧片缺失',
-            },
-            {
-              category_fault: '金具',
-              value: '金具缺插销',
-              fault_type: '金具缺插销',
-            },
-            {
-              category_fault: '金具',
-              value: '线夹有放电痕迹',
-              fault_type: '线夹有放电痕迹',
-            },
-            {
-              category_fault: '金具',
-              value: '线夹锈蚀',
-              fault_type: '线夹锈蚀',
-            },
-            {
-              category_fault: '金具',
-              value: '导线与支柱绝缘子固定不牢',
-              fault_type: '导线与支柱绝缘子固定不牢',
-            },
-            {
-              category_fault: '金具',
-              value: '金具有放电灼烧痕迹',
-              fault_type: '金具有放电灼烧痕迹',
-            },
-            {
-              category_fault: '金具',
-              value: '导、地线防振锤脱落',
-              fault_type: '导、地线防振锤脱落',
-            },
-            {
-              category_fault: '金具',
-              value: '金具有裂纹',
-              fault_type: '金具有裂纹',
-            },
-            {
-              category_fault: '金具',
-              value: '金具锈蚀',
-              fault_type: '金具锈蚀',
-            },
-            {
-              category_fault: '金具',
-              value: '防震锤脱落',
-              fault_type: '防震锤脱落',
-            },
-            {
-              category_fault: '金具',
-              value: '防震锤滑移',
-              fault_type: '防震锤滑移',
-            },
-            {
-              category_fault: '金具',
-              value: '金具受力部位变形',
-              fault_type: '金具受力部位变形',
-            },
-            {
-              category_fault: '导地线',
-              value: '导线散股',
-              fault_type: '导线散股',
-            },
-            {
-              category_fault: '导地线',
-              value: '地线散股',
-              fault_type: '地线散股',
-            },
-            {
-              category_fault: '导地线',
-              value: '导线断股',
-              fault_type: '导线断股',
-            },
-            {
-              category_fault: '导地线',
-              value: '地线断股',
-              fault_type: '地线断股',
-            },
-            {
-              category_fault: '导地线',
-              value: '电缆头螺栓锈蚀',
-              fault_type: '电缆头螺栓锈蚀',
-            },
-            {
-              category_fault: '导地线',
-              value: '电缆头发热',
-              fault_type: '电缆头发热',
-            },
-            {
-              category_fault: '导地线',
-              value: '导线锈蚀',
-              fault_type: '导线锈蚀',
-            },
-            {
-              category_fault: '导地线',
-              value: '地线锈蚀',
-              fault_type: '地线锈蚀',
-            },
-            {
-              category_fault: '导地线',
-              value: '电缆头外护套破损',
-              fault_type: '电缆头外护套破损',
-            },
-            {
-              category_fault: '导地线',
-              value: '导线有异物',
-              fault_type: '导线有异物',
-            },
-            {
-              category_fault: '导地线',
-              value: '地线有异物',
-              fault_type: '地线有异物',
-            },
-            {
-              category_fault: '导地线',
-              value: '地线接地端安装不规范',
-              fault_type: '地线接地端安装不规范',
-            },
-            {
-              category_fault: '导地线',
-              value: '塔基接地扁铁未可靠接地',
-              fault_type: '塔基接地扁铁未可靠接地',
-            },
-            {
-              category_fault: '附属设施',
-              value: '避雷器破损',
-              fault_type: '避雷器破损',
-            },
-            {
-              category_fault: '附属设施',
-              value: '避雷器未接地',
-              fault_type: '避雷器未接地',
-            },
-            {
-              category_fault: '附属设施',
-              value: '避雷器与导线脱离',
-              fault_type: '避雷器与导线脱离',
-            },
-            {
-              category_fault: '附属设施',
-              value: '避雷器计数器失灵',
-              fault_type: '避雷器计数器失灵',
-            },
-            {
-              category_fault: '附属设施',
-              value: '避雷器接地线位置安装错误',
-              fault_type: '避雷器接地线位置安装错误',
-            },
-            {
-              category_fault: '附属设施',
-              value: '塔号牌缺失',
-              fault_type: '塔号牌缺失',
-            },
-            {
-              category_fault: '附属设施',
-              value: '电缆穿管处未封堵',
-              fault_type: '电缆穿管处未封堵',
-            },
-            {
-              category_fault: '附属设施',
-              value: '防鸟罩破损',
-              fault_type: '防鸟罩破损',
-            },
-            {
-              category_fault: '附属设施',
-              value: '防鸟罩脱落',
-              fault_type: '防鸟罩脱落',
-            },
-            {
-              category_fault: '杆塔',
-              value: '杆塔上有异物',
-              fault_type: '杆塔上有异物',
-            },
-            {
-              category_fault: '杆塔',
-              value: '杆塔上有鸟窝',
-              fault_type: '杆塔上有鸟窝',
-            },
-            {
-              category_fault: '杆塔',
-              value: '塔材缺失',
-              fault_type: '塔材缺失',
-            },
-            {
-              category_fault: '杆塔',
-              value: '杆塔锈蚀',
-              fault_type: '杆塔锈蚀',
-            },
-            {
-              category_fault: '杆塔',
-              value: '杆塔螺栓缺失',
-              fault_type: '杆塔螺栓缺失',
-            },
-            {
-              category_fault: '杆塔',
-              value: '杆塔螺帽退出',
-              fault_type: '杆塔螺帽退出',
-            },
-            {
-              category_fault: '杆塔',
-              value: '杆塔受力构件松动',
-              fault_type: '杆塔受力构件松动',
-            },
-            {
-              category_fault: '杆塔',
-              value: '杆塔受力构件变形',
-              fault_type: '杆塔受力构件变形',
-            },
-            {
-              category_fault: '杆塔',
-              value: '杆塔倾斜',
-              fault_type: '杆塔倾斜',
-            },
-            {
-              category_fault: '基础',
-              value: '基础倾斜',
-              fault_type: '基础倾斜',
-            },
-            {
-              category_fault: '基础',
-              value: '基础附件水土流失',
-              fault_type: '基础附件水土流失',
-            },
-            {
-              category_fault: '基础',
-              value: '基础长期泡水',
-              fault_type: '基础长期泡水',
-            },
-            {
-              category_fault: '基础',
-              value: '基础立柱裂纹',
-              fault_type: '基础立柱裂纹',
-            },
-            {
-              category_fault: '基础',
-              value: '基础钢筋外露',
-              fault_type: '基础钢筋外露',
-            },
-            {
-              category_fault: '基础',
-              value: '基础边坡塌陷',
-              fault_type: '基础边坡塌陷',
-            },
-            {
-              category_fault: '通道环境',
-              value: '通道存在树障',
-              fault_type: '通道存在树障',
-            },
-            {
-              category_fault: '通道环境',
-              value: '通道存在异物',
-              fault_type: '通道存在异物',
-            },
-          ]
-          let list = []
-          let arr = data
-            console.log(type,11111)
-          if(type){
-            list = arr.filter((item) => {
-              return item.category_fault === type;
-            })
-          }else{
-            list = arr
-          }
-          console.log(list,432423)
-          this.faultTypeArray = list;
-    },
     setSize() {
       //  document.body.clientWidth
       let width = document.body.clientWidth;
@@ -1045,63 +473,9 @@ export default {
         this.gloHeight = "250vh";
       }
     },
-    // 多选  切换故障类型的回调
-    changefault_type() {},
-    // 单选
-    changeSelect() {
-      console.log(this.faultArray,222)
-      // if (!this.form.fault_type || this.form.fault_type == "fault") {
-      //     this.$message.warning("请选择故障类型!");
-      //     return false;
-      //   }
-      // this.form.fjposition = this.faultArray.filter((item) => {
-      //   return item.value === this.form.fault_type;
-      // })[0].category_fault;
-      // this.form.category_name = this.fjpositionList.filter((item) => {
-      //   return item.code == this.form.fjposition;
-      // })[0].name
-      // this.form.handling_suggestions = this.faultArray.filter((item) => {
-      //   return item.value === this.form.fault_type;
-      // })[0].handling_suggestions;
-      // this.form.fault_info = this.faultArray.filter((item) => {
-      //   return item.value === this.form.fault_type;
-      // })[0].fault_type;
-      // this.form.fault_level = this.faultArray.filter((item) => {
-      //   return item.value === this.form.fault_type;
-      // })[0].fault_level;
-      let index = this.arrIndex;
-      this.formArr[index].fault_type = this.form.fault_type;
-      this.formArr[index].img_position = this.form.img_position;
-      this.formArr[index].fault_type_name = this.form.fault_type;
-      this.formArr[index].fjposition = this.form.fjposition;
-      this.formArr[index].category_name = this.form.fjposition;
-      this.formArr[index].category_fault = this.form.fjposition;
-      this.formArr[index].handling_suggestions =
-        this.form.handling_suggestions != ""
-          ? this.form.handling_suggestions
-          : "暂无建议";
-      this.formArr[index].fault_info = this.form.fault_type;
-      this.formArr[index].fault_level = this.form.fault_level;
-      this.formArr[index].important = this.form.important;
-      console.log(this.formArr,this.arrIndex,9998)
-      // this.form.errorNum = this.form.fault_type === "-1" ? 0 : 1;
-    },
-    changeSwitch() {
-      let index = this.arrIndex;
-      this.formArr[index].important = this.form.important;
-    },
-    changeYp(val) {
-      this.formArr.forEach((item) => {
-        item.ypId = val;
-      });
-    },
-    changePosition(val) {
-      let index = this.arrIndex;
-      this.getErrorType(val)
-      this.form.fault_type = null
-      this.$forceUpdate();
-      this.formArr[index].fjposition = val;
-    },
+  
+   
+   
     // 查看时，不许标注
     resetMode() {
       if (this.canChange) {
@@ -1112,253 +486,11 @@ export default {
         this.setMode("PAN");
       }
     },
-    // 初始化图片数据库
-    initimgDB() {
-      let that = this;
-      imgDB = window.indexedDB.open("lineImage");
-      imgDB.onerror = function (event) {
-        console.log("数据库打开报错");
-      };
-
-      imgDB.onsuccess = function (event) {
-        imgdb = event.target.result;
-      };
-
-      imgDB.onupgradeneeded = function (event) {
-        imgdb = event.target.result;
-        var objectStore;
-        if (!imgdb.objectStoreNames.contains("imgTable")) {
-          objectStore = imgdb.createObjectStore("imgTable", {
-            keyPath: "id",
-            autoIncrement: false,
-          });
-          objectStore.createIndex("id", "id", { unique: false });
-        } else {
-        }
-      };
-    },
-    readImage(id, callback) {
-      var transaction = imgdb.transaction(["imgTable"]);
-      var objectStore = transaction.objectStore("imgTable");
-      var request = objectStore.get(id);
-
-      request.onerror = function (event) {
-        console.log("事务失败");
-      };
-
-      request.onsuccess = function (event) {
-        if (request.result) {
-          callback && callback(request.result);
-        } else {
-          callback && callback(request.result);
-          console.log("未获得数据记录");
-        }
-      };
-    },
-    cacheImageAlone(data, link) {
-      let that = this;
-      that.getBase64(data).then((base64) => {
-      let image = new Image();
-      image.src = base64;
-      image.onload = () => {
-          let obj1 = {
-              base64: base64,
-              id: link, // 图片唯一id：md5值
-            };
-          that.putIndexedDB(obj1, () => {
-            console.log('缓存成功',obj1.id)
-          })
-      };
-    });
-    },
-    getBase64(imgUrl) {
-      return new Promise((resolve) => {
-        window.URL = window.URL || window.webkitURL;
-        var xhr = new XMLHttpRequest();
-        xhr.open("get", imgUrl, true); // 至关重要
-        xhr.responseType = "blob";
-        xhr.onload = function () {
-          if (this.status == 200) {
-            //得到一个blob对象
-            var blob = this.response;
-            console.log("blob", blob); // 至关重要
-            let oFileReader = new FileReader();
-            oFileReader.onloadend = function (e) {
-              let base64 = e.target.result;
-              //             console.log("方式一》》》》》》》》》", base64)
-              resolve(base64);
-            };
-            oFileReader.readAsDataURL(blob);
-          }
-        };
-        xhr.send();
-      });
-    },
-    putIndexedDB(obj, callback) {
-      let that = this;
-      imgDB = window.indexedDB.open("lineImage");
-      imgDB.onerror = function (event) {
-        console.log("数据库打开报错");
-      };
-
-      imgDB.onsuccess = function (event) {
-        imgdb = event.target.result;
-        var objectStore = imgdb
-          .transaction(["imgTable"], "readwrite")
-          .objectStore("imgTable");
-        // console.log("数据库打开成功");
-        objectStore.put(obj);
-        callback && callback(obj.id);
-        console.log(obj.id, "更新成功");
-      };
-
-      imgDB.onupgradeneeded = function (event) {
-        imgdb = event.target.result;
-
-        var objectStore;
-        if (!imgdb.objectStoreNames.contains("imgTable")) {
-          objectStore = imgdb.createObjectStore("imgTable", {
-            keyPath: "id",
-            autoIncrement: false,
-          });
-          objectStore.createIndex("id", "id", { unique: false });
-        } else {
-        }
-      };
-    },
-    async getImages(id,list) {
-      let that = this;
-      let imgList = await that.$db.imgList.where('taskPlanCode').startsWithIgnoreCase(id).toArray()
-            let arr = []
-             arr = imgList.map((item) => {
-              //  let nameArr = item.split("/")
-              //  let file_name = nameArr[nameArr.length-1];
-              //  if(this.renameModelType==2){
-              //   file_name = nameArr[nameArr.length-2]+'/'+nameArr[nameArr.length-1];
-              //  }
-              //  let src = file_name.split('.')[0]
-              return {
-                file_name: item.name,
-                show_name: item.showName,
-                minio_link: item.fileName,
-                file_link: item.imgUrl,
-                task_id: that.task_id,
-                zone_id: that.wtg_id,
-                station_id: that.wtg_plant_id,
-                fault_location: '',
-                fault_type_code: '',
-                release_status: 0,
-                important: 1,
-                error_num: 0,
-                md5: item.imgUrl,
-                label: item.showName,
-              };
-              
-            });
-             arr.forEach((item, index) => {
-              list.forEach((element) => {
-                  if (item.file_name == element.file_name) {
-                    item.fault_list = element.fault_list;
-                    item.error_num = JSON.parse(element.fault_list).length;
-                    item.poi_type = element.poi_type;
-                    item.img_position = element.img_position;
-                    item.position = element.position;
-                    item.show_name = element.show_name
-                    item.label = element.show_name
-                  }
-                });
-             })
-             console.log(that.showType,4235235)
-            that.imgsrcNowList = that.showType==1? list : arr
-            if (that.imgsrcNowList.length == 0) {
-              that.$message.warning("暂无故障信息！");
-            }
-            this.imgIndex = 0;
-             this.changeImage(this.imgsrcNowList[0], this.imgIndex);
-        
-    },
-   async getData(id,name) {
-      let that = this;
-       
-            let arr = await that.$db.markList.where('task_id').startsWithIgnoreCase(id).toArray()
-            
-            arr.forEach((item) => {
-               let src = item.show_name
-              // let arr = item.file_link.split("/");
-              let md5 = item.file_link;
-              item.label = src;
-              item.md5 = md5;
-              item.img_position = item.img_position
-              item.error_num = JSON.parse(item.fault_list).length;
-            });
-            //  arr = data.report_data.map((item) => {
-            //   return {
-            //     fileName: item,
-            //     taskId: that.task_id,
-            //     areaId: that.wtg_id,
-            //     plantId: that.wtg_plant_id,
-            //     fault_type: "",
-            //   };
-            // });
-            that.imgsrcNowList = arr
-           that.getImages(id,arr);
-            // console.log(that.imgsrcNowList,31232)
-            // that.imgIndex = 0;
-            // that.changeImage(that.imgsrcNowList[0], that.imgIndex);
-       
-    },
     
-    // 更新进度和颜色
-    updateProgress() {
-      let num = 0;
-      for (let index = 0; index < this.imgsrcNowList.length; index++) {
-        const element = this.imgsrcNowList[index];
-        if (element.imagefault_type !== "未知") {
-          num++;
-        }
-      }
-      this.progress = Math.floor((num / this.imgsrcNowList.length) * 100);
-    },
-    // 图片编号排序，设置默认打开的图片（第0个）
-    setLabel() {
-     
-      // 文件夹数组
-      let floder = this.imgsrcNowList.map((item) => {
-        return item.labelPrev;
-      });
-      // 去重
-      floder = [...new Set(floder)];
-      let eleIndex = [];
-
-      for (let i = 0; i < floder.length; i++) {
-        const elementj = floder[i];
-        let obj = {
-          label: parseInt(elementj),
-          value: 0,
-          arr: [],
-        };
-        // 将相同文件夹的图片编号放到一个数组内
-        for (
-          let index = 0, len = this.imgsrcNowList.length;
-          index < len;
-          index++
-        ) {
-          const element = this.imgsrcNowList[index];
-          if (element["labelPrev"] === elementj) {
-            obj.arr.push(parseInt(element["labelNext"]));
-          }
-        }
-        // 获取每个文件夹文件数量
-        // obj.value = Math.max.apply(null, obj.arr);
-        obj.value = obj.arr.length;
-        eleIndex.push(obj);
-      }
-      this.folderList = eleIndex;
-      this.imgIndex = 0;
-      // this.getNextImage();
-      // console.log(this.imgsrcNowList,1111111)
-      this.changeImage(this.imgsrcNowList[0], this.imgIndex);
-    },
+    
+   
+ 
+   
     // 切换图片
     getNextImage() {
       let that = this;
@@ -1375,109 +507,9 @@ export default {
       
      
     },
-  
-    // 根据id获取数据
-    read(id, callback) {
-      let that = this;
-      imgDB = window.indexedDB.open("lineImage");
-      imgDB.onerror = function (event) {
-        console.log("数据库打开报错");
-      };
-      imgDB.onupgradeneeded = function (event) {
-        imgdb = event.target.result;
 
-        var objectStore;
-        if (!imgdb.objectStoreNames.contains("imgTable")) {
-          objectStore = imgdb.createObjectStore("imgTable", {
-            keyPath: "id",
-            autoIncrement: false,
-          });
-          objectStore.createIndex("id", "id", { unique: false });
-        } else {
-        }
-      };
-      imgDB.onsuccess = function (event) {
-        imgdb = event.target.result;
-        var objectStore;
-        var request;
-        if (!imgdb.objectStoreNames.contains("imgTable")) {
-          objectStore = imgdb.createObjectStore("imgTable", {
-            keyPath: "id",
-            autoIncrement: false,
-          });
-          objectStore.createIndex("id", "id", { unique: false });
-        } else {
-          objectStore = imgdb
-            .transaction(["imgTable"], "readwrite")
-            .objectStore("imgTable");
-          request = objectStore.get(id);
-        }
-        request.onerror = function (event) {
-          console.log("事务失败");
-        };
-
-        request.onsuccess = function (event) {
-          if (request.result) {
-            // console.log('Name: ' + request.result.name);
-            callback && callback(request.result);
-          } else {
-            callback && callback(request.result);
-          }
-        };
-      };
-    },
-    // 遍历数据库获取所有数据
-    readAll(subtask_id, callback) {
-      let imgIDList = [];
-      var objectStore = db.transaction("imgTable").objectStore("imgTable");
-
-      objectStore.openCursor().onsuccess = function (event) {
-        var cursor = event.target.result;
-
-        if (cursor) {
-          //   console.log("Id: " + cursor.key);
-          if (cursor.value.subtask_id === subtask_id) {
-            imgIDList.push({
-              id: cursor.value.id,
-              md5: cursor.value.md5,
-              name: cursor.value.name,
-              directoryName: cursor.value.directoryName,
-              type: cursor.value.type,
-              taskId: cursor.value.taskId,
-              subtask_id: cursor.value.subtask_id,
-              label: cursor.value.label,
-              labelId: cursor.value.labelId,
-              labelPrev: cursor.value.labelPrev,
-              labelNext: cursor.value.labelNext,
-              fengji: cursor.value.fengji,
-              imagefault_type: cursor.value.imagefault_type,
-              wtg_image: cursor.value.wtg_image,
-              wtg_id: cursor.value.wtg_id,
-              fjposition: cursor.value.fjposition,
-              handling_suggestions: cursor.value.handling_suggestions,
-              fault_level: cursor.value.fault_level,
-              important: cursor.value.important,
-              ypId: cursor.value.ypId,
-              panorama_location: cursor.value.panorama_location,
-              panorama_location_wh: cursor.value.panorama_location_wh,
-              error: cursor.value.error,
-              errorNum: cursor.value.errorNum,
-              fault_type: cursor.value.fault_type,
-              description: cursor.value.description,
-              errorForm: cursor.value.errorForm,
-              GPS: cursor.value.GPS,
-              GPSAltitude: cursor.value.GPSAltitude,
-              uav_data_type: cursor.value.Model,
-            });
-          }
-
-          cursor.continue();
-        } else {
-          callback && callback(imgIDList);
-          //   console.log("没有更多数据了！");
-        }
-      };
-    },
+    
+   
 
     getIndex(id) {
       let ind = null;
@@ -2343,15 +1375,7 @@ export default {
       this.form.type = "rect";
       this.form.points = data;
       this.form.maskPoints = points;
-      if (form) {
-        this.form.fault_type = form.fault_type;
-        this.form.handling_suggestions = form.handling_suggestions;
-        this.form.fault_level = form.fault_level;
-        this.form.img_position = form.img_position;
-        this.form.fjposition = form.fjposition;
-        this.form.img_position = form.img_position;
-        this.form.important = form.important - 0 ? true : false;
-      }
+    
       this.initText();
       // this.setMode("PAN");
       this.setMode("DRAWMASK");
@@ -2380,55 +1404,6 @@ export default {
       //     }
       //   });
     },
-    // 故障信息
-    updateErrorInfo(val,subForm) {
-      let imgDir = localStorage.getItem('imgPath')
-      console.log('应用路径3:', imgDir);
-      console.log(this.originForm, this.isnext);
-      let data = val
-      data.file_link = this.originForm.minio_link
-      data.minio_bucket_line = 'line'
-      data.show_name = this.originForm.show_name
-      data.station_id = this.originForm.station_id
-      data.zone_id = this.originForm.zone_id
-      console.log(data,999)
-      this.$db.markList.put(data);
-      let obj = {
-        fileName: this.originForm.file_name,
-        targetPath:  `${imgDir}/${this.originForm.task_id}/${this.originForm.file_name}`,
-        zoneId: this.originForm.zone_id,
-        taskId: this.originForm.task_id,
-        planAreaName: this.wtgName,
-        stationId:this.originForm.station_id,
-        faultList: val.fault_list,
-        isSync: 0,
-        showName: this.originForm.show_name
-      }
-      console.log(obj,1111)
-      this.$db.faultList.put(obj);
-      // this.$fetch({
-      //   url: "/line/api/v1/line_report/",
-      //   method: "post",
-      //   data: val,
-      // }).then((data) => {
-      //   if (data && data.code === 1000) {
-          
-      //     // this.getData(this.taskId)
-          if (this.isnext === "next") {
-            this.$message.success("该图片标注信息保存成功");
-            this.nextImg();
-          }else if(this.isnext === "prev"){
-            this.$message.success("该图片标注信息保存成功");
-            this.prevImg();
-          }else if(this.isnext == "del"){
-            this.$message.success("删除标注成功！");
-          }else{
-            this.$message.success("该图片标注信息保存成功");
-          }
-      //   } else {
-      //   }
-      // });
-    },
     getLabelByValue(value, array) {
       if (!isNaN(value - 0)) {
         return array.filter((item) => {
@@ -2455,233 +1430,8 @@ export default {
       return array;
     },
     // 提交操作
-    submit() {
-      console.log("标注框", this.RectList);
-      console.log("全景图", this.panorama);
-      console.log("表单", this.formArr);
-      console.log(this.originForm, 123);
-      let that = this;
-      let subForm = [];
-      let imgSrc = document.getElementById("mapImg2");
-      let imgWidth =
-        imgSrc.naturalWidth 
-      let imgHeight =
-        imgSrc.naturalHeight 
-      console.log(
-        imgSrc.naturalWidth,
-        imgWidth,
-        imgSrc.naturalHeight,
-        imgHeight
-      );
-      if (this.formArr.length<1&&this.isnext!='del') {
-          that.$message.warning("请标注故障!");
-          return false;
-        }
-      for (let index = 0; index < this.formArr.length; index++) {
-        const element = this.formArr[index];
-        console.log(element,index,333)
-        // errorNum = errorNum - 0 + (element.errorNum - 0);
-        let obj;
-       
-        if (!element.fjposition || element.fjposition == "") {
-          that.$message.warning("请选择故障位置!");
-          return false;
-        }
-        if (!element.fault_type || element.fault_type == "fault") {
-          that.$message.warning("请选择故障类型!");
-          return false;
-        }
-        if (!element.fault_level || element.fault_type == "") {
-          that.$message.warning("请选择故障等级!");
-          return false;
-        }
-        // element.fault_info = that.faultArray.filter((item) => {
-        //   return item.value === element.fault_type;
-        // })[0].fault_info;
-        // element.fault_type_name = that.faultArray.filter((item) => {
-        //   return item.value === element.fault_type;
-        // })[0].fault_type;
-        // element.fjposition = that.faultArray.filter((item) => {
-        //   return item.value === element.fault_type;
-        // })[0].category_fault;
-        // element.category_name = that.fjpositionList.filter((item) => {
-        //   return item.code == element.fjposition;
-        // })[0].name
-        element.fault_level = this.formArr[index].fault_level
-        element.fault_info = this.formArr[index].fault_type
-        element.fault_type_name = this.formArr[index].fault_type
-        element.category_name = this.formArr[index].fjposition
-        element.category_fault = this.formArr[index].fjposition
-        element.img_position = this.formArr[index].img_position
-        // element.category_fault = that.faultArray.filter((item) => {
-        //   return item.value === element.fault_type;
-        // })[0].category_fault;
-        // element.trail = this.setSizeMask(element.maskPoints, {
-        //   width: imgWidth,
-        //   height: imgHeight,
-        // });
-        if (element["points"]) {
-          // obj = {
-          //   wtg_task_image_id:this.originForm.wtg_task_image_id,
-          //   task_id:this.originForm.task_id,
-          //   label: element.label,
-          //   fault_type: element.fault_type,
-          //   id: element.id,
-          //   taskId: element.taskId,
-          //   subtask_id: element.subtask_id,
-          //   imageId: element.imageId,
-          //   errorNum: element.errorNum,
-          //   wtg_id: element.wtg_id,
-          //   handling_suggestions: element.handling_suggestions,
-          //   fjposition: element.fjposition,
-          //   labelId: element.labelId,
-          //   ypId: element.ypId,
-
-          //   xy: [
-          //     this.getxy(element["points"]).x/imgWidth,
-          //     this.getxy(element["points"]).y/imgHeight,
-          //     this.getxy(element["points"]).w/imgWidth,
-          //     this.getxy(element["points"]).h/imgHeight,
-          //   ],
-          // };
-          obj = {
-            file_name: this.originForm.file_name,
-            show_name: this.form.label,
-            img_position: this.form.img_position || "",
-            wtg_plant_id: this.originForm.wtg_plant_id,
-            trail: JSON.stringify(element.trail) || "",
-            important: 1,
-            release_status: 1,
-            zone_id: this.wtg_id,
-            station_id: this.wtg_plant_id,
-             planAreaName: this.wtgName,
-            // wtg_task_image_id: this.originForm.wtg_task_image_id,
-            task_id: this.originForm.task_id,
-            fault_type_code: element.fault_type || "",
-            fault_type_name: element.fault_type_name || "",
-            fault_info: element.fault_info || "",
-            fault_level: element.fault_level || "",
-            category_fault: element.category_fault || "",
-            category_name: element.category_name || "",
-            handling_suggestions: element.handling_suggestions || "",
-            fault_location: [
-              Math.round(element["points"].x) ,
-              Math.round(element["points"].y) ,
-              Math.round(element["points"].x + element["points"].width),
-              Math.round(element["points"].y + element["points"].height),
-            ].join(","),
-          };
-        } else {
-          // obj = {
-          //   wtg_task_image_id:this.originForm.wtg_task_image_id,
-          //   task_id:this.originForm.task_id,
-          //   label: element.label,
-          //   labelId: element.labelId,
-          //   fault_type: element.fault_type,
-          //   id: element.id,
-          //   taskId: element.taskId,
-          //   subtask_id: element.subtask_id,
-          //   imageId: element.imageId,
-          //   errorNum: element.errorNum,
-          //   wtg_id: element.wtg_id,
-          //   handling_suggestions: element.handling_suggestions,
-          //   fjposition: element.fjposition,
-          //   ypId: element.ypId,
-          //   xy: element.xy,
-          // };
-          obj = {
-            file_name:  this.originForm.file_name,
-            show_name: this.form.label,
-            img_position: this.form.img_position || "",
-            trail: JSON.stringify(element.trail) || "",
-            folder_name: this.originForm.folder_name,
-            wtg_plant_id: this.originForm.wtg_plant_id,
-            release_status: 1,
-            zone_id: this.wtg_id,
-            planAreaName: this.wtgName,
-            station_id: this.wtg_plant_id,
-            // wtg_task_image_id: this.originForm.wtg_task_image_id,
-            task_id: this.originForm.task_id,
-            fault_type_code: element.fault_type || "",
-            fault_info: element.fault_info || "",
-            fault_level: element.fault_level || "",
-            category_fault: element.category_fault || "",
-            category_name: element.category_name || "",
-            handling_suggestions: element.handling_suggestions || "",
-            important: 1,
-            fault_location: [
-              element.xy[0],
-              element.xy[1],
-              (element.xy[0] + element.xy[2]),
-              (element.xy[1] + element.xy[3]),
-            ].join(","),
-          };
-        }
-        console.log(
-          Math.round(element["points"].x),
-          Math.round(element["points"].y),
-          Math.round(element["points"].x + element["points"].width),
-          Math.round(element["points"].y + element["points"].height)
-        );
-        subForm.push(obj);
-      }
-      this.updateFormArr();
-
-      // // 本地数据库添加故障信息
-      // // this.setOriginDB();
-      // // 接口更新故障信息
-      console.log(subForm,123)
-      let data = {
-        file_name: this.originForm.file_name,
-        img_position: this.form.img_position,
-        task_id: this.originForm.task_id,
-        fault_list: JSON.stringify(subForm),
-      };
-
-      this.originForm.poi_type = this.form.fjposition;
-      this.originForm.position = this.form.ypId;
-      this.originForm.fault_list = data.fault_list;
-      this.originForm.label = this.form.label;
-      this.originForm.error_num = this.formArr.length;
-      console.log(this.originForm, 321);
-      this.uploadErrorForm(this.originForm);
-      console.log("保存数据", data, subForm);
-      if (this.isnext != "") {
-        this.updateErrorInfo(data,subForm);
-      }
-      //
-      // // this.setIneedDBErrorDB(objDB);  // spinning
-      // // this.subForm = JSON.parse(JSON.stringify(subForm));
-    },
-    setOriginDB() {
-      let that = this;
-      var request = db
-        .transaction(["imgTable"], "readwrite")
-        .objectStore("imgTable")
-        .put(this.originForm);
-
-      request.onsuccess = function (event) {
-        console.log("数据更新成功");
-        that.$message.success("数据更新成功");
-        that.uploadErrorForm();
-      };
-
-      request.onerror = function (event) {
-        console.log("数据更新失败");
-        that.$message.error("数据更新失败");
-      };
-    },
-    // 更新标注数据
-    uploadErrorForm(res) {
-      let that = this;
-      that.originForm = [];
-      // that.read(that.imgsrcNowList[that.imgIndex].id, (res) => {
-      that.imgsrcNowList.splice(that.imgIndex, 1, res);
-      that.originForm = JSON.parse(JSON.stringify(res));
-      that.$forceUpdate();
-      // that.updateProgress();
-      // });
-    },
+   
+ 
     // 根据存储的左上角为原点的(x, y,width, height)，转换为图片中心为原点的（x, y, w, h）
     getposition(array) {
       let obj1 = {
@@ -2728,35 +1478,13 @@ export default {
       console.log(this.subForm,666)
       for (let index = 0; index < this.subForm.length; index++) {
         const element = this.subForm[index];
-        console.log(element.fault_type_code);
         if (element.xy) {
           // 操作页面保存的故障类型为数字
 
-          if (this.myIsNaN(element.fault_type - 0)) {
-            element.fault_type = element.fault_type_code;
-          }
+          
         } else {
-          element.fault_type = element.fault_type_name;
-          element.fjposition = element.category_name;
-        //   if (!element.fault_type || element.fault_type == "fault") {
-        //   this.$message.warning("请选择故障类型!");
-        //   return false;
-        // }
-        //   element.handling_suggestions = this.faultArray.filter((item) => {
-        //     return item.value === element.fault_type;
-        //   })[0].handling_suggestions;
-        //   element.fjposition = this.faultArray.filter((item) => {
-        //     return item.value === element.fault_type;
-        //   })[0].category_fault;
-        //   element.category_name = that.fjpositionList.filter((item) => {
-        //   return item.code == element.fjposition;
-        // })[0].name
-        //   element.important = this.faultArray.filter((item) => {
-        //     return item.value === element.fault_type;
-        //   })[0].important;
-        //   element.fault_level = this.faultArray.filter((item) => {
-        //     return item.value === element.fault_type;
-        //   })[0].fault_level;
+         
+       
           element.id = this.guid();
           let x =
             Number(this.subForm[index].fault_location.split(",")[0]) ;
@@ -2804,7 +1532,6 @@ export default {
             width: element.xy[2],
             height: element.xy[3],
           },
-          fault_type: element.fault_type,
           index: index,
           id: element.id,
           props: element,
@@ -2876,12 +1603,12 @@ export default {
         );
       }
     },
-    huixianByPoint(points, fault_type, ZIndex, id, element) {
+    huixianByPoint(points,  ZIndex, id, element) {
       // console.log(points, fault_type, ZIndex, id, element,111)
-      this.setRect(points, fault_type, ZIndex, id, element);
+      this.setRect(points, ZIndex, id, element);
     },
     // 回显矩形
-    setRect(points, fault_type, ZIndex, id, element) {
+    setRect(points, ZIndex, id, element) {
       // const gFetureStyle = ({
       //   strokeColor: "#58f707",
       //   fillColor: "#58f707",
@@ -3078,11 +1805,144 @@ export default {
     // },
     // 切换第index张图片标注
     changeImage(item, index) {
-    
+      let that = this;
+      console.log(item,index,8888)
+      // this.imgsrcNow = "";
+      this.imgIndex = index
+      if (gMap) {
+        gMap.destroy();
+      }
+      that.imgsrcNow = 'file://' + item.file_link.replace(/\\/g, "/")
+     
+      
+        
+      setTimeout(() => {
+        that.successLoading()
+        that.getArrayBuffer(item.file)
+       }, 150);
+
+    },
+    async getArrayBuffer(file){
+      let that = this
+      EXIF.getData(file, () => {
+        const allMetaData = EXIF.getAllTags(file);
+        that.imgData.focalLengthIn35mmFilm = allMetaData.FocalLengthIn35mmFilm
+        that.imgData.model = allMetaData.Model.replace("Z", "")
+      });
+      function readFileAsArrayBuffer(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsArrayBuffer(file); // 读取为 ArrayBuffer
+        });
+      }
+      const arrayBuffer = await readFileAsArrayBuffer(file);
+      const uint8Array = new Uint8Array(arrayBuffer);
+      const data = new TextDecoder().decode(uint8Array);
+
+        // 查找 XMP 数据块的起止位置
+        const xmpStart = data.indexOf('<x:xmpmeta');
+        const xmpEnd = data.indexOf('</x:xmpmeta>') + 12;
+
+        if (xmpStart !== -1 && xmpEnd !== -1) {
+            const xmpData = data.substring(xmpStart, xmpEnd);
+            console.log('XMP 数据:', xmpData);
+
+            // 使用 DOMParser 解析 XMP 的 XML 数据
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmpData, 'text/xml');
+            console.log('xmlDoc 数据:', xmlDoc);
+            // 定义命名空间解析器
+            const namespaceResolver = (prefix) => {
+              const ns = {
+                rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+                "drone-dji": "http://www.dji.com/drone-dji/1.0/"
+              };
+              return ns[prefix] || null;
+            };
+
+            // 提取值的函数
+            function getAttributeValue(xpath) {
+              const result = xmlDoc.evaluate(
+                xpath,
+                xmlDoc,
+                namespaceResolver,
+                XPathResult.STRING_TYPE,
+                null
+              );
+              const value = result.stringValue;
+              return parseFloat(value); // 转换为浮点型
+            }
+            // 提取 DJI 扩展字段
+            that.imgData.gpsLongitude = getAttributeValue("//rdf:Description/@drone-dji:GpsLongitude");
+            that.imgData.gpsLatitude = getAttributeValue("//rdf:Description/@drone-dji:GpsLatitude");
+            that.imgData.absoluteAltitude = getAttributeValue("//rdf:Description/@drone-dji:AbsoluteAltitude");
+            that.imgData.relativeAltitude = getAttributeValue("//rdf:Description/@drone-dji:RelativeAltitude");
+
+            that.imgData.gimbalPitchDegree = getAttributeValue("//rdf:Description/@drone-dji:GimbalPitchDegree");
+            that.imgData.gimbalYawDegree = getAttributeValue("//rdf:Description/@drone-dji:GimbalYawDegree");
+            that.imgData.gimbalRollDegree = getAttributeValue("//rdf:Description/@drone-dji:GimbalRollDegree");
+
+            that.imgData.lrfTargetDistance = getAttributeValue("//rdf:Description/@drone-dji:LRFTargetDistance");
+
+            // 打印结果
+            console.log("GpsLongitude:", JSON.stringify(that.imgData));
+
+        } else {
+            console.error('未找到 XMP 数据');
+        }
+    },
+    // 图片加载成功
+    successLoading() {
+      let img = document.getElementsByClassName("loadingImgbigsiagn2")[0];
+      this.imgHeight = img.naturalHeight;
+      this.imgWidth = img.naturalWidth;
+      this.imgData.picWidth = this.imgWidth
+      console.log(this.imgWidth,11111)
+      this.gImageLayerArr = [];
+      (this.PolygonList = []),
+        (this.RectList = []),
+        (this.PolylineList = []),
+        (this.TextList = []),
+        (this.formArr = []);
+      this.rectZIndex = 2;
+      gMap = null;
+      gImageLayer = null;
+      gFirstFeatureLayer = null;
+      gFirstMaskLayer = null;
+      gTextLayer2 = null;
+
+      // this.initgMap();
+      this.successed();
+      console.log(this.subForm,this.form,4444)
+     
+      this.saveLoading = false;
     },
     // 初始化文字标注
     initText() {
       console.log("initText", this.form);
+      let posi = this.getPath(this.form.points);
+      this.imgPoints = posi
+      const exePath = '../static/draw.exe';
+      const publicExePath = process.env.NODE_ENV== 'development'? "E:\\web\\electron-vue2\\src\\static\\draw.exe": path.join(__dirname, exePath);
+      const exeUrl = publicExePath;
+      const transformedData = Object.fromEntries(
+        Object.entries(this.imgData).map(([key, value]) => [key, String(value)])
+      );
+      const jsonString = JSON.stringify(transformedData).replace(/"/g, '\\"');
+      const cmd = `'${exeUrl}' '${jsonString}' '${posi}'`;
+      console.log(cmd,6666)
+      exec(cmd, (error, stdout, stderr) => {
+        if (error) {
+          console.error('执行命令出错:', error);
+          
+          that.$alert(`生成出错:${error}`)
+          return;
+        }else{
+          console.log(stdout,stderr,6666)
+        }
+      })
       this.formArr.push(JSON.parse(JSON.stringify(this.form)));
     },
     // 获取矩形左上角坐标
@@ -3107,51 +1967,12 @@ export default {
       if (next) {
         this.spinning = true;
       }
-      // const text = gTextLayer2.getTextById(`text` + this.form.id);
-      // if (text) {
-      //   let fault_type = "";
-      //   if (this.myIsNaN(this.form.fault_type - 0)) {
-      //     fault_type = this.getLabelByValue(
-      //       this.form.fault_type,
-      //       this.faultArray
-      //     ).fault_type_code;
-      //   } else {
-      //     fault_type = this.form.fault_type;
-      //   }
-      //   text.update({ text: "" });
+      
 
-      //   this.saveGlobal();
-      // } else {
-
-        this.submit();
-      // };
-      // this.saveGlobal();
+      
     },
     // 更新当前标注文件
-    updateFormArr() {
-      this.form.errorNum = this.formArr.length;
-      for (let index = 0; index < this.formArr.length; index++) {
-        const element = this.formArr[index];
-        if (element.id === this.form.id) {
-          element.label = this.form.label;
-          element.labelId = this.form.labelId;
-          element.fault_type = this.form.fault_type;
-          element.img_position = this.form.img_position;
-          element.fault_info = this.form.fault_info;
-          element.category_name = this.form.category_name;
-          element.fault_level = this.form.fault_level;
-          element.errorNum = this.formArr.length;
-          element.imageId = this.imageId;
-          element.wtg_id = this.form.wtg_id;
-          element.ypId = this.form.ypId;
-          element.handling_suggestions = this.form.handling_suggestions;
-          element.important = this.form.important;
-          element.fault_level = this.form.fault_level;
-          element.fjposition = this.form.fjposition;
-          element.maskPoints = this.form.maskPoints;
-        }
-      }
-    },
+   
     // 设置（回显）文字标注
     setText(xy, form) {
       let that = this;
@@ -3209,6 +2030,11 @@ export default {
       let x = points.x - this.imgWidth / 2;
       let y = this.imgHeight / 2 - points.y;
       return { x: x, y: y };
+    },
+    //  矩形x,y,w,h转成对角点
+    getPath(array) {  
+      let string = `${parseInt(array.x)},${parseInt(array.y)},${parseInt(array.x+array.width)},${parseInt(array.y+array.height)}`
+      return string
     },
     // 绘制矩形
     drawRect() {
@@ -3311,7 +2137,6 @@ export default {
             // this.form.fjposition = this.faultArray.filter((item) => {
             //   return item.value === this.form.fault_type;
             // })[0].category_fault;
-            this.getErrorType(this.form.fjposition)
             this.getscreenToWorld(this.form.points);
             break;
           }
@@ -3455,9 +2280,7 @@ export default {
         this.setactiveElement(fea);
       } else {
         this.form.id = undefined;
-        this.form.fault_level = undefined;
-        this.form.fault_type = undefined;
-        this.form.fault_type_code = undefined;
+        
       }
       // console.log("this.formArr", this.formArr);
       // console.log("this.RectList", this.RectList);
@@ -3585,8 +2408,7 @@ export default {
 }
 .cjhx-content {
   position: relative;
-  width: 100%;
-  height: calc(100vh - 118px);
+  height: calc(100vh - 28px);
   padding: 10px;
   display: flex;
   overflow: hidden;
@@ -3671,7 +2493,7 @@ export default {
 
 .ailabelEdit-box {
   width:  calc(100% - 2px) ;
-  height: 96%;
+  height: calc(100% - 32px);
   border: 1px solid;
   overflow: hidden;
 }
@@ -3722,6 +2544,7 @@ export default {
 </style>
 <style>
 .cjhx-box2 .el-dialog__body {
+    box-sizing: border-box;
     padding: 10px 20px !important;
   }
 .cjhx-box2 ul {
@@ -3731,17 +2554,25 @@ list-style-type: none !important;
 
 }
 .cjhx-box2 li{
+  box-sizing: border-box;
   padding: 5px;
   display: flex !important;
   justify-content: space-between !important;
   align-items: center !important;
 }
 .cjhx-box2 .ant-list-item-action{
+  box-sizing: border-box;
   margin-left: 30px !important;
 }
 .cjhx-box2 .ant-spin-nested-loading{
   display: flex;
   justify-content: center;
+}
+.ant-empty-normal{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 @media screen and (max-width: 1366px) {
   /*当屏幕尺寸小于1366px时，应用下面的CSS样式*/
