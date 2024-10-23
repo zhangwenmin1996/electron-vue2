@@ -25,6 +25,7 @@
     "dexie": "^3.2.5",
     "element-ui": "^2.15.14",
     "exif-js": "^2.3.0",
+    "iconv-lite": "^0.6.3",
     "minio": "^7.0.19",
     "node-polyfill-webpack-plugin": "^2.0.1",
     "node-sass": "^4.14.1",

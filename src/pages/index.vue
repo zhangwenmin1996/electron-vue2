@@ -124,8 +124,10 @@
 import Vue from "vue";
 import { ipcRenderer } from 'electron';
 import fs from 'fs';
+import EXIF from "exif-js";
 const { exec } = require('child_process');
 const path = require('path');
+const iconv = require('iconv-lite');
 import { List, Card, Progress } from "ant-design-vue";
 Vue.use(List);
 import deleteIcon from "@/assets/delete.png";
@@ -307,6 +309,7 @@ export default {
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {
     let that = this;
+    this.init()
     Array.prototype.max = function () {
       return Math.max.apply({}, this);
     };
@@ -411,50 +414,13 @@ export default {
       console.log(val,this.form.img_position,666666)
     },
     //   初始化标注组件
-    init(val) {
-      this.version = 1;
-      this.formObj = val
-      this.showType = val.type
-      this.title = val.baseCodeName + "分析结果审核";
-      this.taskId = val.taskPlanCode;
-      this.taskNum = val.id;
-      this.taskStatus = val.status;
-      this.renameModelType = val.renameModelType;
-      this.subtask_id = val.taskPlanCode;
-      // task_id: undefined,
-      this.task_id = val.taskPlanCode;
-      // wtg_plant_id: undefined,
-      this.wtg_plant_id = val.baseCode;
-      // wtg_id: undefined,
-      this.wtg_id = val.planArea;
-      this.openType = "ailabel";
-      this.canChange = true;
-      this.visible = true;
-      this.spinning = false;
-      this.wtgName = val.planAreaName;
+    init() {
       gMap = null;
       gImageLayer = null;
       gFirstMaskLayer = null;
       gFirstFeatureLayer = null;
       gTextLayer2 = null;
-      this.imgsrcNowList = [];
-      this.imgsrcNow = "";
-      this.gloSrc = null;
-      this.imgIndex = 0;
-      this.treeData = [
-        {
-          label: val.planAreaName,
-          child1: "1",
-          disabled: true,
-          children: [],
-        },
-      ];
-      this.setSize();
-      // this.initIndeedDB();
-      let name = val.planArea+'/'+val.taskPlanCode
-      this.getDict()
-      this.getData(val.taskPlanCode,name)
-      // this.initimgDB();
+      
     },
    
     setSize() {
@@ -638,10 +604,10 @@ export default {
 
       this.gImageLayerArr.push(gImageLayer);
       // 文本层实例\添加
-      // gTextLayer2 = new AILabel.Layer.Text("textLayer2" + timestamp, {
-      //   zIndex: this.rectZIndex,
-      // });
-      // gMap.addLayer(gTextLayer2);
+      gTextLayer2 = new AILabel.Layer.Text("textLayer2" + timestamp, {
+        zIndex: this.rectZIndex,
+      });
+      gMap.addLayer(gTextLayer2);
 
       this.huixian();
       /*
@@ -850,12 +816,12 @@ export default {
       gMap.addLayer(gFirstMaskLayer);
 
       // 添加文本层
-      gFirstTextLayer = new AILabel.Layer.Text(
+      gTextLayer2 = new AILabel.Layer.Text(
         "first-layer-text", // id
         { name: "第一个文本图层" }, // props
         { zIndex: 12, opacity: 1 } // style
       );
-      gMap.addLayer(gFirstTextLayer);
+      gMap.addLayer(gTextLayer2);
 
       // 添加图形
       // this.addmoredata();
@@ -989,7 +955,7 @@ export default {
       that = this;
       this.showmarkimg();
       this.huixian();
-      this.setMode("PAN");
+      this.setMode("RECT");
       // 绘制结束
       gMap.events.on("drawDone", (type, data, data1) => {
         // console.log('type, data', type, data);
@@ -1130,6 +1096,7 @@ export default {
           //     fontColor: "#0f0",
           //   } // style
           // );
+        
           // gFirstTextLayer.addText(gFirstText);
         }
         // 添加多边形
@@ -1922,17 +1889,37 @@ export default {
     // 初始化文字标注
     initText() {
       console.log("initText", this.form);
+      // gTextLayer2 = new AILabel.Layer.Text(this.form.id, {zIndex: 20});
+      // gMap.addLayer(gTextLayer2);
+
       let posi = this.getPath(this.form.points);
       this.imgPoints = posi
       const exePath = '../static/draw.exe';
-      const publicExePath = process.env.NODE_ENV== 'development'? "E:\\web\\electron-vue2\\src\\static\\draw.exe": path.join(__dirname, exePath);
+      const publicExePath = process.env.NODE_ENV== 'development'? "C:/Users/Administrator/Desktop/web/electron-vue2/src/static/draw.exe": path.join(__dirname, exePath);
       const exeUrl = publicExePath;
       const transformedData = Object.fromEntries(
         Object.entries(this.imgData).map(([key, value]) => [key, String(value)])
       );
       const jsonString = JSON.stringify(transformedData).replace(/"/g, '\\"');
-      const cmd = `'${exeUrl}' '${jsonString}' '${posi}'`;
+      const cmd = `${exeUrl} ${jsonString} ${posi}`;
       console.log(cmd,6666)
+      // const command = spawn(`${exeUrl}`, [`'${jsonString}'`, `'${posi}'`]);
+      // command.stdout.on('data', (data) => {
+      //   const decodedData = iconv.decode(data, 'gbk');
+      //   console.log(`stdout: ${decodedData}`);
+      // });
+
+      // command.stderr.on('data', (data) => {
+      //   console.error(`stderr: ${data}`);
+      // });
+
+      // command.on('error', (error) => {
+      //   console.error(`执行出错: ${error.message}`);
+      // });
+
+      // command.on('close', (code) => {
+      //   console.log(`子进程退出，退出码 ${code}`);
+      // });
       exec(cmd, (error, stdout, stderr) => {
         if (error) {
           console.error('执行命令出错:', error);
@@ -1940,7 +1927,12 @@ export default {
           that.$alert(`生成出错:${error}`)
           return;
         }else{
-          console.log(stdout,stderr,6666)
+          const decodedData = iconv.decode(stdout, 'gbk');
+          const [length, width] = decodedData.split(' ');
+          let label = `长：${length}m，宽：${width}m`;
+          that.setText(that.form.points,that.form,label)
+          console.log(decodedData,6666)
+          console.log(stderr,7777)
         }
       })
       this.formArr.push(JSON.parse(JSON.stringify(this.form)));
@@ -1974,19 +1966,21 @@ export default {
     // 更新当前标注文件
    
     // 设置（回显）文字标注
-    setText(xy, form) {
+    setText(xy, form,label) {
       let that = this;
+      console.log(xy.x,xy.y)
       const timestamp = new Date().getTime();
+      const text = gTextLayer2.getTextById(form.id);
       const gTextStyle = {
         fontColor: "#FF0000",
         fontSize: 14,
-        strokeColor: "#0000FF",
+        lineWeight: 2,
+        strokeColor: "#1890FF",
         opacity: 1,
       };
+     
       // // 文本层实例\添加
-      // let gTextLayer = new AILabel.Layer.Text('textLayer', {zIndex: 2});
-      // gMap.addLayer(gTextLayer);
-
+      
       // // 文本实例\添加
       // const text = new AILabel.Text('id', {
       //     pos: {x: 0, y: 0},
@@ -1997,23 +1991,30 @@ export default {
       // }, gTextStyle);
       // gTextLayer.addText(text);
       // 文本实例\添加
-      let text2 = new AILabel.Text(
-        "text" + form.id,
-        {
-          pos: { x: xy.x, y: xy.y },
-          offset: { x: 0, y: 0 },
-          maxWidth: 100,
-          // text: form.fault_type,
-          text: "",
-          data: {
-            pid: this.form.id,
+      if (text) {
+        text.show();
+        text.update({ text: label });
+        console.log(label,123)
+      } else {
+        let text2 = new AILabel.Text(
+          "text" + timestamp,
+          {
+            position: { x: xy.x, y: xy.y },
+            offset: { x: 0, y: 0 },
+            maxWidth: 100,
+            text: label,
+            data: {
+              pid: timestamp,
+            },
+            
           },
-        },
-        gTextStyle
-      );
-      // text2.
-      that.TextList.push(text2);
-      gTextLayer2.addText(text2);
+          gTextStyle
+        );
+        // text2.
+        that.TextList.push(text2);
+        gTextLayer2.addText(text2);
+        console.log(label,that.TextList,321)
+      }
     },
     // 获取各个点实际px值
     // 把以图片中心为原点的坐标转换为以图片左上角为原点的坐标
