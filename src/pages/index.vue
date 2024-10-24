@@ -1897,11 +1897,19 @@ export default {
       // command.on('close', (code) => {
       //   console.log(`子进程退出，退出码 ${code}`);
       // });
+      const loading = this.$loading({
+          lock: true,
+          text: '数据计算中',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
       exec(cmd, (error, stdout, stderr) => {
+        loading.close();
         if (error) {
-          console.error('执行命令出错:', error);
+          const errorData = iconv.decode(error, 'gbk');
+          console.error('执行命令出错:', errorData);
           
-          that.$alert(`生成出错:${error}`)
+          that.$alert(`生成出错:${errorData}`)
           return;
         }else{
           const decodedData = iconv.decode(stdout, 'gbk');
@@ -1974,7 +1982,7 @@ export default {
         console.log(label,123)
       } else {
         let text2 = new AILabel.Text(
-          "text" + timestamp,
+          form.id,
           {
             position: { x: xy.x, y: xy.y },
             offset: { x: 0, y: 2 },
@@ -2208,6 +2216,7 @@ export default {
         this.RectList.splice(deleteindex, 1);
         // this.hideRect(id);
         this.TextList.splice(deleteindex, 1);
+        gTextLayer2.removeTextById(id);
         gFirstFeatureLayer.removeFeatureById(id);
         gFirstMaskLayer.removeActionById(id);
         this.$forceUpdate();
@@ -2217,6 +2226,7 @@ export default {
         this.RectList.splice(deleteindex, 1);
         // this.hideRect(id);
         this.TextList.splice(deleteindex, 1);
+        gTextLayer2.removeTextById(id);
         gFirstFeatureLayer.removeFeatureById(id);
         gFirstMaskLayer.removeActionById(id);
         this.$forceUpdate();
