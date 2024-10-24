@@ -8,10 +8,9 @@ Vue.use(ElementUI);
 import uploader from '@/components/uploader/src'
 Vue.use(uploader)
 import { parseTime } from "@/api/utils";
-import db from '@/api/indexDb'
 import fetch from '@/api/fetch'
 import zklffetch from '@/api/zklffetch'
-Vue.prototype.$db = db
+
 Vue.prototype.$fetch = fetch
 Vue.prototype.$zklffetch = zklffetch
 Vue.prototype.parseTime = parseTime

@@ -1347,30 +1347,7 @@ export default {
       // this.setMode("PAN");
       this.setMode("DRAWMASK");
     },
-    // 标注完成
-    backailabel() {
-      let that = this;
-      // that
-      //   .$http({
-      //     // formdata 传值方式
-      //     url: "api/inspection/inspection/taskPlan/update",
-      //     method: "post",
-      //     data: {
-      //       id: that.taskNum,
-      //       taskPlanCode: that.taskId,
-      //       status: 13,
-      //     },
-      //   })
-      //   .then((data) => {
-      //     if (data && data.status == 200) {
-            that.$message.success("标注完成！");
-            let id = that.taskNum
-            that.$db.dataList.update(id,{status:10,isSync: 0,statusName: '已完成标注',localStatus: '已完成标注'})
-            that.$emit("refresh",this.formObj);
-      //       that.handleCancel();
-      //     }
-      //   });
-    },
+ 
     getLabelByValue(value, array) {
       if (!isNaN(value - 0)) {
         return array.filter((item) => {
@@ -1895,7 +1872,7 @@ export default {
       let posi = this.getPath(this.form.points);
       this.imgPoints = posi
       const exePath = '../static/draw.exe';
-      const publicExePath = process.env.NODE_ENV== 'development'? "C:/Users/Administrator/Desktop/web/electron-vue2/src/static/draw.exe": path.join(__dirname, exePath);
+      const publicExePath = process.env.NODE_ENV== 'development'? "E:/web/electron-vue2/src/static/draw.exe": path.join(__dirname, exePath);
       const exeUrl = publicExePath;
       const transformedData = Object.fromEntries(
         Object.entries(this.imgData).map(([key, value]) => [key, String(value)])
@@ -2000,7 +1977,7 @@ export default {
           "text" + timestamp,
           {
             position: { x: xy.x, y: xy.y },
-            offset: { x: 0, y: -2 },
+            offset: { x: 0, y: 2 },
             maxWidth: 100,
             text: label,
             data: {
