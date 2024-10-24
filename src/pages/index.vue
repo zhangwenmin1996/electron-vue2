@@ -1894,7 +1894,7 @@ export default {
 
       let posi = this.getPath(this.form.points);
       this.imgPoints = posi
-      const exePath = '../static/draw.exe';
+      const exePath = '../static/draw.exe';  //  C:/Users/Administrator/Desktop/web/electron-vue2/src/static/draw.exe
       const publicExePath = process.env.NODE_ENV== 'development'? "C:/Users/Administrator/Desktop/web/electron-vue2/src/static/draw.exe": path.join(__dirname, exePath);
       const exeUrl = publicExePath;
       const transformedData = Object.fromEntries(
