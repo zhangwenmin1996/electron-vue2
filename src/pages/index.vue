@@ -85,7 +85,7 @@
                 <el-button
                   @click="clearMask()"
                   type="danger"
-                  :disabled="!canChange"
+                  :disabled="RectList<1"
                   size="small"
                   >删除标记</el-button
                 >
