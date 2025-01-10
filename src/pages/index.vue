@@ -61,6 +61,7 @@
               <el-button type="primary" icon="el-icon-plus" size="small" @click="showEdit(0)">新增计划</el-button>
               <!-- <el-button type="primary" icon="el-icon-refresh" size="small" @click="syncData">拉取数据</el-button> -->
               <el-button type="primary" icon="el-icon-delete" size="small" @click="delData">清空数据</el-button>
+              <el-button type="primary" icon="el-icon-plus" size="small" @click="showEdit(0)">批量上传计划</el-button>
               <!-- <el-button type="primary" icon="el-icon-refresh" size="small" @click="syncTaskData">同步列表</el-button>
               <el-button type="primary" icon="el-icon-refresh" size="small" @click="syncLineData">同步故障</el-button>
               <el-button type="primary" icon="el-icon-refresh" size="small" @click="syncImgData">同步图片</el-button> -->
@@ -77,6 +78,7 @@
         :row-key="getRowKeys" 
         :expand-row-keys="expands" 
         @expand-change="handleExpand"
+        @row-click="eSelect"
       >
         <el-table-column type="expand">
           <template>
@@ -191,24 +193,30 @@
         <template slot-scope="scope">
           <el-button
            type="text" size='medium'
-            @click="eSelect(scope.row)"
+           @click.stop="eSelect(scope.row)"
             >查看详情</el-button
           >
           <el-button
            type="text" size='medium'
            :loading="scope.row.btnLoading"
-            @click="report(scope.row)"
+           @click.stop="report(scope.row)"
             >{{scope.row.docxUrl?'重新生成':'生成报告'}}</el-button>
           <el-button
            type="text" size='medium'
            v-if="scope.row.docxUrl"
-            @click="reportSee(scope.row)"
+           @click.stop="reportSee(scope.row)"
             >查看报告</el-button
           >
           <el-button
            type="text" size='medium'
      
-            @click="deleteItems(scope.row,2)"
+           @click.stop="uploadTaskArray(scope.row,scope.$index)"
+            >批量上传</el-button
+          >
+          <el-button
+           type="text" size='medium'
+     
+           @click.stop="deleteItems(scope.row,2)"
             >删除</el-button
           >
         </template>
@@ -243,7 +251,7 @@
       <line-edit @save-ok="editOk" :data="editForm" :isEdit="isEdit"></line-edit>
     </el-dialog>
     <line-image ref="line"  v-for="item in list" :key="item.id"  @refresh="getDataList"></line-image>
-    <!-- <line-arr ref="lineList" @refresh="getData" ></line-arr> -->
+    <line-arr ref="lineList"  v-for="(item,index) in planList" :key="index"  @refresh="getDataList" ></line-arr>
     <ailabel-add-or-update
     ref="ailabelAddOrUpdate"
     @refresh="getDataList"
@@ -263,7 +271,7 @@ import lineEdit from "./line-edit";
 import AilabelAddOrUpdate from "./ailabelAddOrUpdate";
 import { uploadMinIo, getBase64 } from "@/api/utils";
 import { json } from 'stream/consumers';
-// import lineArr from "./lineArr";
+import lineArr from "./lineArr";
 // import { addListener, launch } from 'devtools-detector';
 // import Datastore from 'nedb'
 export default {
@@ -272,6 +280,7 @@ export default {
   components: {
     AilabelAddOrUpdate,
     lineImage,
+    lineArr,
     lineEdit,
   },
   data() {
@@ -473,6 +482,9 @@ export default {
                obj[planAreaName].faultList.push(row);
             });
             arr = Object.values(obj);
+            arr.taskList.sort((a, b) => {
+                return a.planAreaName.localeCompare(b.planAreaName);
+            });
             console.log(arr3,arr,2222)
           });
        
@@ -678,6 +690,11 @@ export default {
       }, 200);
       this.total2 = data.length
       console.log(data);
+    },
+    async uploadTaskArray(row,index){
+      let that = this;
+      let data = await this.$db.dataList.where('planCode').startsWithIgnoreCase(row.planCode).toArray()
+      that.$refs['lineList'][index].init(row,data);
     },
     getPlan(){
       let that = this
