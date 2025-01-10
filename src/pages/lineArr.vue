@@ -191,7 +191,7 @@ export default {
   //方法集合
   methods: {
     init(row,val) {
-      // this.propData = {
+      this.propData = row
       //   line_task_id: val.taskPlanCode,
       //   line_plant_id: val.baseCode,
       //   line_id: val.planArea,
@@ -417,8 +417,8 @@ export default {
       //   };
       //   this.updateData(data);
       // }
-       
-       this.$emit("refresh");
+      that.visible = false;
+      that.$emit("refresh",this.propData);
     },
     onFileError(rootFile, file, response, chunk) {
       let that = this
@@ -432,9 +432,9 @@ export default {
       if (that.fileIndex < that.fileArr.length) {
         that.setFolder(that.fileArr[that.fileIndex]);
       }else{
-        this.visible = false;
-        this.$message.success("已上传完全部文件");
-        this.$emit("refresh",this.taskList[0]);
+        that.visible = false;
+        that.$message.success("已上传完全部文件");
+        that.$emit("refresh",this.propData);
       }
     },
     setChecked1(val){
