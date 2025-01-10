@@ -265,6 +265,7 @@
 import { ipcRenderer } from 'electron';
 import fs from 'fs';
 const path = require('path');
+const iconv = require('iconv-lite');
 const { exec } = require('child_process');
 import lineImage from "./line";
 import lineEdit from "./line-edit";
@@ -482,9 +483,6 @@ export default {
                obj[planAreaName].faultList.push(row);
             });
             arr = Object.values(obj);
-            arr.taskList.sort((a, b) => {
-                return a.planAreaName.localeCompare(b.planAreaName);
-            });
             console.log(arr3,arr,2222)
           });
        
@@ -492,11 +490,14 @@ export default {
       }
       const exePath = '../static/main.exe';
       const docxPath = '../static/template_line_m30t.docx';
-     const publicExePath = process.env.NODE_ENV== 'development'? "E:/web/electron-vue2/src/static/main.exe":  path.join(__dirname, exePath);
+     const publicExePath = process.env.NODE_ENV== 'development'? "E:/web/electron-vue2/src/static/cs t1/main.exe":  path.join(__dirname, exePath);
      const publicDocxPath =process.env.NODE_ENV== 'development'? "E:/web/electron-vue2/src/static/template_line_m30t.docx": path.join(__dirname, docxPath);
 
       console.log('文件夹:',process.env.NODE_ENV,publicExePath,publicDocxPath);
      setTimeout(() => {
+        arr.sort((a, b) => {
+            return a.planAreaName.localeCompare(b.planAreaName);
+        });
         data.taskList = arr
         const jsonData = JSON.stringify(data, null, 2);
        const folderPath = `${that.jsonDir}/${row.planCode}`; // 你的文件夹路径
@@ -510,19 +511,19 @@ export default {
       fs.writeFileSync(filePath, jsonData);
       console.log('JSON 文件已保存到:', filePath);
       console.log(data,3333)
-      const exeUrl = publicExePath
+      const exeUrl =  publicExePath.toString()
       const docxUrl = publicDocxPath
       const docxPathUrl = path.join(that.docxList, `${data.simpleName}${data.loopName}无人机输电线路巡检报告_${that.parseTime(new Date().getTime(),'{y}{m}{d}{h}{i}{s}')}.docx`);
       // const docxPathUrl = path.join(that.docxList, `${data.simpleName}${data.loopName}无人机输电线路巡检报告.docx`);
       // const cmd = `E:\\web\\electron-vue2\\dist\\main.exe ${filePath} E:\\docxList E:\\web\\electron-vue2\\dist\\template_line_m30t.docx`;
-      const cmd = `${exeUrl} ${filePath} ${docxPathUrl} ${docxUrl}`;
+      const cmd = `"${exeUrl}" ${filePath} ${docxPathUrl} ${docxUrl}`;
       console.log(cmd,333)
       that.$message.success('报告正在生成，请稍等...')
       exec(cmd, (error, stdout, stderr) => {
         if (error) {
-          console.error('执行命令出错:', error);
+          console.error('执行命令出错:', error, stdout, stderr);
           that.$set(row,'btnLoading',false)
-          that.$alert(`报告生成出错:${error}`)
+          that.$alert(`报告生成出错:${error.toString('utf8')}`)
           return;
         }else{
           let id = row.planCode
