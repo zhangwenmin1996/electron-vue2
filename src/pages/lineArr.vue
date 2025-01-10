@@ -417,7 +417,7 @@ export default {
       //   };
       //   this.updateData(data);
       // }
-       this.$message.success("已上传完全部文件");
+       
        this.$emit("refresh");
     },
     onFileError(rootFile, file, response, chunk) {
@@ -433,7 +433,8 @@ export default {
         that.setFolder(that.fileArr[that.fileIndex]);
       }else{
         this.visible = false;
-        this.$emit("refresh");
+        this.$message.success("已上传完全部文件");
+        this.$emit("refresh",this.taskList[0]);
       }
     },
     setChecked1(val){
@@ -446,7 +447,7 @@ export default {
       }
     },
     async updateData(row) {
-      this.$message.success("已上传完全部文件");
+      // this.$message.success("已上传完全部文件");
       // this.visible = false;
       let id = row.id
       this.$db.dataList.update(id,{status:1,isSync: 0,statusName: '已上传数据',localStatus: '已上传数据'})
@@ -465,7 +466,7 @@ export default {
                   id: that.taskList[listIndex].id,
                   status: 1,
                 };
-                that.$message.success(that.taskList[listIndex].taskName+"已上传完全部文件");
+                // that.$message.success(that.taskList[listIndex].taskName+"已上传完全部文件");
                 that.listIndex = that.listIndex+1
                 that.updateData(data);
             }
