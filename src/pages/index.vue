@@ -483,6 +483,9 @@ export default {
                obj[planAreaName].faultList.push(row);
             });
             arr = Object.values(obj);
+            arr.taskList.sort((a, b) => {
+                return a.planAreaName.localeCompare(b.planAreaName);
+            });
             console.log(arr3,arr,2222)
           });
        
@@ -495,10 +498,8 @@ export default {
 
       console.log('文件夹:',process.env.NODE_ENV,publicExePath,publicDocxPath);
      setTimeout(() => {
-        arr.sort((a, b) => {
-            return a.planAreaName.localeCompare(b.planAreaName);
-        });
         data.taskList = arr
+
         const jsonData = JSON.stringify(data, null, 2);
        const folderPath = `${that.jsonDir}/${row.planCode}`; // 你的文件夹路径
       // 确保文件夹存在，如果不存在则创建
