@@ -482,9 +482,7 @@ export default {
                obj[planAreaName].faultList.push(row);
             });
             arr = Object.values(obj);
-            arr.taskList.sort((a, b) => {
-                return a.planAreaName.localeCompare(b.planAreaName);
-            });
+            
             console.log(arr3,arr,2222)
           });
        
@@ -497,7 +495,13 @@ export default {
 
       console.log('文件夹:',process.env.NODE_ENV,publicExePath,publicDocxPath);
      setTimeout(() => {
+      console.log(arr,7777)
+        arr.sort((a, b) => {
+            return a.planAreaName.localeCompare(b.planAreaName);
+        });
+        console.log(arr,6666)
         data.taskList = arr
+
         const jsonData = JSON.stringify(data, null, 2);
        const folderPath = `${that.jsonDir}/${row.planCode}`; // 你的文件夹路径
       // 确保文件夹存在，如果不存在则创建
@@ -515,7 +519,7 @@ export default {
       const docxPathUrl = path.join(that.docxList, `${data.simpleName}${data.loopName}无人机输电线路巡检报告_${that.parseTime(new Date().getTime(),'{y}{m}{d}{h}{i}{s}')}.docx`);
       // const docxPathUrl = path.join(that.docxList, `${data.simpleName}${data.loopName}无人机输电线路巡检报告.docx`);
       // const cmd = `E:\\web\\electron-vue2\\dist\\main.exe ${filePath} E:\\docxList E:\\web\\electron-vue2\\dist\\template_line_m30t.docx`;
-      const cmd = `${exeUrl} ${filePath} ${docxPathUrl} ${docxUrl}`;
+      const cmd = `"${exeUrl}" ${filePath} ${docxPathUrl} ${docxUrl}`;
       console.log(cmd,333)
       that.$message.success('报告正在生成，请稍等...')
       exec(cmd, (error, stdout, stderr) => {
