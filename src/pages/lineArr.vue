@@ -417,8 +417,9 @@ export default {
       //   };
       //   this.updateData(data);
       // }
-      that.visible = false;
-      that.$emit("refresh",this.propData);
+      this.visible = false;
+      that.$message.success("已上传完全部文件");
+      this.$emit("refresh",this.propData);
     },
     onFileError(rootFile, file, response, chunk) {
       let that = this
@@ -433,7 +434,7 @@ export default {
         that.setFolder(that.fileArr[that.fileIndex]);
       }else{
         that.visible = false;
-        that.$message.success("已上传完全部文件");
+        
         that.$emit("refresh",this.propData);
       }
     },
