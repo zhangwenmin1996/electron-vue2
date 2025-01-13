@@ -216,6 +216,7 @@ props:{
             inspectionScene: 2,
             inspectionSceneName: "输电线路巡检",
             isDock: false,
+            loopName: that.editForm.loopName,
             planArea: "",
             planAreaName: that.editForm.planArea,
             planCode: getUUID(),

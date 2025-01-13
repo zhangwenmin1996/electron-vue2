@@ -189,8 +189,13 @@
         
         </el-table-column>
         
-        <el-table-column align="center" label="操作" width="380">
+        <el-table-column align="center" label="操作" width="420">
         <template slot-scope="scope">
+          <el-button
+           type="text" size='medium'
+           @click.stop="addTask(scope.row)"
+            >新增任务</el-button
+          >
           <el-button
            type="text" size='medium'
            @click.stop="eSelect(scope.row)"
@@ -248,7 +253,36 @@
       :modal-append-to-body="false"
       width="600px"
     >
-      <line-edit @save-ok="editOk" :data="editForm" :isEdit="isEdit"></line-edit>
+      <line-edit @save-ok="editOk" :data="dataForm" :isEdit="isEdit"></line-edit>
+    </el-dialog>
+    <el-dialog
+      :close-on-click-modal="false"
+      title="新增任务"
+      :visible.sync="isShowTask"
+      v-if="isShowTask"
+      center
+      custom-class="box-dialog"
+      :modal-append-to-body="false"
+      width="600px"
+    >
+      <el-form :model="editForm" label-width="80px" ref="editForm">
+        <el-form-item label="巡检回路" prop="loopName" >
+            <el-input v-model="editForm.loopName" clearable size="small"></el-input>
+        </el-form-item>
+        <el-form-item label="巡检杆塔" >
+            <el-input v-model="editForm.prefix" placeholder="杆塔前缀（可不填）" clearable size="small" style="width:46%"></el-input>
+            <el-input v-model="editForm.suffix" placeholder="杆塔后缀（可不填）" clearable size="small" style="width:46%;margin-left: 2%;"></el-input>
+            <br/>
+            <el-input v-model="editForm.start" placeholder="杆塔起始号（必填）" clearable size="small" style="width:46%"></el-input>
+            <el-input v-model="editForm.num" placeholder="杆塔数量（必填）" clearable size="small" style="width:46%;margin-left: 2%;"></el-input>
+            <br/>
+            <span style="color: #999;font-size: 12px;">如：创建配网2-11号的杆塔，前缀填：配网，后缀填：号，起始号为2，数量为10</span>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button class="btn2" @click.native="isShowTask=false">取消</el-button>
+        <el-button class="btn2" type="primary" @click.native="editSubmit">确定</el-button>
+      </div>
     </el-dialog>
     <line-image ref="line"  v-for="item in list" :key="item.id"  @refresh="getDataList"></line-image>
     <line-arr ref="lineList"  v-for="(item,index) in planList" :key="index"  @refresh="getDataList" ></line-arr>
@@ -267,6 +301,7 @@ import fs from 'fs';
 const path = require('path');
 const iconv = require('iconv-lite');
 const { exec } = require('child_process');
+import { getUUID } from "@/api/utils";
 import lineImage from "./line";
 import lineEdit from "./line-edit";
 import AilabelAddOrUpdate from "./ailabelAddOrUpdate";
@@ -307,8 +342,10 @@ export default {
 			list: [],
 			total: 0,
       isShowEdit: false,
+      isShowTask: false,
 	    isEdit: 0,
       editForm: {},
+      dataForm: {},
       sceneList: [],
       tableDb: null,
       listDB: null,
@@ -471,6 +508,11 @@ export default {
           data.loopName = item.loopName,
           faultList.forEach(element => {
             let arr2 = JSON.parse(element.faultList)
+            // arr2.forEach(i => {
+            //   if(i.fault_level=='重要')  {
+            //     i.fault_level='严重'
+            //   }
+            // });
             let arr3 = [...arr2]
             arr3.forEach(row => {
               let { planAreaName } = row;
@@ -480,12 +522,12 @@ export default {
                   faultList: [],
                 };
               }
+              // if(row.fault_level=='重要'){
+              //   row.fault_level=='严重'
+              // }
                obj[planAreaName].faultList.push(row);
             });
             arr = Object.values(obj);
-            arr.taskList.sort((a, b) => {
-                return a.planAreaName.localeCompare(b.planAreaName);
-            });
             console.log(arr3,arr,2222)
           });
        
@@ -493,12 +535,15 @@ export default {
       }
       const exePath = '../static/main.exe';
       const docxPath = '../static/template_line_m30t.docx';
-     const publicExePath = process.env.NODE_ENV== 'development'? "E:/web/electron-vue2/src/static/cs t1/main.exe":  path.join(__dirname, exePath);
+     const publicExePath = process.env.NODE_ENV== 'development'? "E:/web/electron-vue2/src/static/main.exe":  path.join(__dirname, exePath);
      const publicDocxPath =process.env.NODE_ENV== 'development'? "E:/web/electron-vue2/src/static/template_line_m30t.docx": path.join(__dirname, docxPath);
 
       console.log('文件夹:',process.env.NODE_ENV,publicExePath,publicDocxPath);
      setTimeout(() => {
-        data.taskList = arr
+      arr.sort((a, b) => {
+          return a.planAreaName.localeCompare(b.planAreaName);
+      });
+      data.taskList = arr
 
         const jsonData = JSON.stringify(data, null, 2);
        const folderPath = `${that.jsonDir}/${row.planCode}`; // 你的文件夹路径
@@ -854,10 +899,85 @@ export default {
         }
       });
     },
+    addTask(row){
+      this.isShowTask = true;
+      console.log(row,111)
+      this.editForm = {
+        companyCode: row.companyCode,
+        companyName: row.companyName,
+        baseCode: row.baseCode,
+        loopName: row.loopName,
+        baseCodeName: row.baseCodeName,
+        planCode: row.planCode,
+        planName: row.planName,
+      };
+    },
+    editSubmit(){
+    let that = this
+    that.$refs.editForm.validate((valid) => {
+      if(valid){
+        let areaCodes = []
+        const startNumber = parseInt(that.editForm.start);
+        const quantity = parseInt(that.editForm.num);
+        for (let i = 0; i < quantity; i++) {
+            const towerNumber = startNumber + i;
+            const towerName = `${that.editForm.prefix||''}${towerNumber}${that.editForm.suffix||''}`;
+            areaCodes.push({
+                name: towerName,
+                code: getUUID()
+            })
+        }
+        areaCodes.forEach(element => { 
+            let obj2 = {
+                accuracy: 1,
+                analyType: 1,
+                analyzeName: "",
+                area: "湖北",
+                baseCode: that.editForm.baseCode,
+                baseCodeName: that.editForm.baseCodeName,
+                baseType: 3,
+                companyCode: that.editForm.companyCode,
+                companyName: that.editForm.companyName,
+                createTime: new Date().getTime(),
+                inspectionDeviceName: "",
+                inspectionScene: 2,
+                loopName: that.editForm.loopName,
+                mapStatusName: "消缺中",
+                picRenameModelId: 1,
+                planArea: element.code,
+                planAreaName: element.name,
+                planCode: that.editForm.planCode,
+                planSourceType: 1,
+                planType: 1,
+                renameModelType: 2,
+                responsibleCode: "f06e8df685fd46ad86287fedbde6384f",
+                responsibleName: "何天",
+                simpleName: that.editForm.baseCodeName,
+                solar: false,
+                status: 0,
+                statusName: "待上传",
+                subarray: "",
+                taskEndTime: '',
+                taskPlanCode: getUUID(),
+                taskPlanName: that.editForm.planName,
+                taskStartTime: '',
+                tower: true,
+                updateTime: new Date().getTime(),
+                useTime: 0,
+                wind: false,
+            }
+            that.$db.dataList.put(obj2);
+        });
+        that.isShowTask = false
+        that.getDataList(that.editForm)
+        console.log(planArea,areaCodes,obj,111111)       
+        }
+      })
+    },
     showEdit(isEdit) {
       this.isEdit = isEdit;
       this.isShowEdit = true;
-      this.editForm = {
+      this.dataForm = {
         companyName: '中广核新能源湖北分公司'
       };
     },

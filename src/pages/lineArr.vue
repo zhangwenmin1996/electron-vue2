@@ -295,7 +295,7 @@ export default {
       let arr2 = file["relativePath"].split("/");
       // let arr1 = arr2[arr2.length - 2];
       console.log(arr2,111111)
-      var  folder_name = arr2[arr2.length-3]+'/'+arr2[arr2.length-2]
+      var  folder_name = arr2[0]+'/'+arr2[1]
        let name = file.name.replace(/#/g, "")
       
       this.taskList.forEach((item,index) => {
@@ -472,8 +472,17 @@ export default {
                 that.updateData(data);
             }
         // let pathArr = file.relativePath.split("/")
-        let nameArr = file.name.split('_')
-        let picIndex = parseInt(nameArr[nameArr.length - 2])
+        let pathArr = file.relativePath.split("/")
+      let nameArr = file.name.split('_')
+      let picIndex = parseInt(nameArr[nameArr.length - 2]) 
+      // console.log(picName,11111)
+      let picPath = file.name.replace(/#/g, "")
+      // let showName =`${form.loopName}-${form.planAreaName}-${picName.length!=0?picName[0].picName:picPath}`
+      picPath = pathArr[pathArr.length-3]+'/'+pathArr[pathArr.length-2]+'_'+
+        nameArr[nameArr.length-2]
+      let showName =`${that.taskList[listIndex].loopName}-${that.taskList[listIndex].planAreaName}-${picPath}`
+        // let nameArr = file.name.split('_')
+        // let picIndex = parseInt(nameArr[nameArr.length - 2])
         // let picPath = file.name.replace(/#/g, "")
         // let showName =`${form.loopName}-${form.planAreaName}-${picName.length!=0?picName[0].picName:picPath}`
         // picPath = pathArr[pathArr.length-3]+'/'+pathArr[pathArr.length-2]+'_'+
@@ -484,7 +493,7 @@ export default {
           taskPlanCode: that.taskList[listIndex].taskPlanCode,
           planArea: that.taskList[listIndex].planArea,
           name: file.name,
-          showName: file.name,
+          showName: showName,
           isSync: 0,
           picIndex: picIndex,
         }

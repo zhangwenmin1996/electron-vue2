@@ -543,7 +543,7 @@ export default {
         taskPlanCode: form.line_task_id,
         planArea: form.line_id,
         name: file.name,
-        showName: file.name,
+        showName: showName,
         isSync: 0,
         picIndex: picIndex,
       }
