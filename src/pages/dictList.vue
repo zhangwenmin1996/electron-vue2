@@ -682,6 +682,7 @@ export default {
     };
   },
   created() {
+    this.$db.open()
   },
   mounted() {
     this.getList()
