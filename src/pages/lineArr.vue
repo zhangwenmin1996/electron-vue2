@@ -30,6 +30,7 @@
           ref="uploadBtn2"
           >上传文件夹</uploader-btn
         >
+        <span class="tips" @click="isTips=true">批量上传提示</span>
         <!-- <el-checkbox v-model="checked1" @change="setChecked1">发起自动分析</el-checkbox> -->
         <!-- <el-checkbox v-model="checked2" @change="setChecked2"
           >放弃自动分析</el-checkbox
@@ -110,6 +111,36 @@
          </div>
       </uploader>
     </el-dialog>
+    <el-dialog
+      :close-on-click-modal="false"
+        title="查看提示"
+      :visible.sync="isTips"
+      append-to-body 
+      width="540px"
+    >
+    <div class="tipsInfo" >
+      <div class="text">
+        如下图所示，批量上传选择文件夹时，必须得选择对应的回路文件夹，即回路名称和文件夹名称要完全相同才能匹配。
+        杆塔名称匹配规则做了优化，只需要杆塔号中的数字一致就可以匹配，如任务中杆塔名称为"xx1号塔"，文件夹中则匹配文件夹
+        第二级的文件名称中带有数字"1"的文件夹。
+      </div>
+      <el-image
+          style="width: 500px"
+          :src="url"
+          :preview-src-list="[url]"
+          :z-index="3000"
+          lazy
+        >
+        <div slot="placeholder" class="image-slot">
+          <i class="el-icon-loading"></i>
+          <div>拼命加载中</div>
+        </div>
+        <div slot="error" class="image-slot">
+          <i class="el-icon-picture-outline pic"></i>
+        </div>
+        </el-image>
+    </div>
+  </el-dialog>
   </div>
 </template>
  
@@ -120,7 +151,9 @@ export default {
   name: "vueName",
   data() {
     return {
-      title: "上传图片",
+      isTips: false,
+      url: require('@/assets/tips.jpg'),
+      title: "批量上传图片",
       visible: false,
       propData: {
         task_id: "",
@@ -545,6 +578,15 @@ export default {
     background: #ebae67;
   }
 }
+.tips{
+  color: #999;
+  font-size: 12px;
+  user-select: none;
+  &:hover{
+    color: #1890ff;
+    cursor: pointer;
+  }
+}
 .file-panel {
   // position: fixed;
   // bottom: 10px;
@@ -675,5 +717,12 @@ export default {
 #global-uploader-btn2 {
   margin: 0 20px 10px 0;
   background: #1890ff;
+}
+.tipsInfo{
+  width: 500px;
+  margin: 5px;
+  img{
+    width: 100%;
+  }
 }
 </style>
