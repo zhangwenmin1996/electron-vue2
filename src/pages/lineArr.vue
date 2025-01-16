@@ -220,7 +220,7 @@ export default {
           loopName: item.loopName,
           taskPlanCode: item.taskPlanCode,
           status: item.status,
-          taskName: item.loopName+'/'+item.planAreaName,
+          taskName: item.loopName+'/'+  parseInt(item.planAreaName.match(/\d+/)[0], 10),
         })
       });
       var obj = {};
@@ -276,6 +276,11 @@ export default {
         this.$forceUpdate()
         this.loading = true;
         setTimeout(() => {
+          this.taskList.forEach(item => {
+            let length = item.fileList.length
+          item.por =  '0/'+ length
+          });
+          
           this.setFolder(this.fileArr[0]);
         }, 1500);
       }
@@ -295,15 +300,16 @@ export default {
       let arr2 = file["relativePath"].split("/");
       // let arr1 = arr2[arr2.length - 2];
       console.log(arr2,111111)
-      var  folder_name = arr2[0]+'/'+arr2[1]
+      var  folder_name = arr2[0]+'/'+parseInt(arr2[1].match(/\d+/)[0], 10)
        let name = file.name.replace(/#/g, "")
       
       this.taskList.forEach((item,index) => {
-        let taskName = item.loopName+'/'+item.planAreaName
+        let taskName = item.loopName +'/'+ parseInt(item.planAreaName.match(/\d+/)[0], 10)
        
         let name2 = item.planArea + "/" + item.taskPlanCode + "/" + file.name;
         if(folder_name==taskName&&item.status<=1 && (arr[arr.length - 1] != "T.JPG" && arr[arr.length - 1] != "W.JPG")){
           item.statu = '待上传'
+         
           item.fileList.push(file)
           // item.fileList.push({
           //   fileName: file.name,

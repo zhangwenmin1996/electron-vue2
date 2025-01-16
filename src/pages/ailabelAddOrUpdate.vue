@@ -152,9 +152,9 @@
               </el-form-item>
               <el-form-item label="图片位置" :label-width="formLabelWidth">
                 <!-- <el-input size="small" v-model="form.img_position" @change="changeSelect" laceholder="请输入图片位置"/> -->
-                <el-cascader :options="options" v-model="form.img_position" @change="changePoptions" :show-all-levels="false" filterable clearable :before-filter="handleBlur"></el-cascader>
+                <el-cascader :options="lineArray" v-model="form.img_position" @change="changePoptions" :show-all-levels="false" filterable clearable :before-filter="handleBlur"></el-cascader>
               </el-form-item>
-              <el-form-item label="故障位置" :label-width="formLabelWidth">
+              <el-form-item label="故障位置" :label-width="formLabelWidth" :rules="[{ required: true, message: '请选择故障位置', trigger: 'blur' }]">
                 <!-- <el-input size="small" v-model="form.fjposition" @change="changeSelect" laceholder="请输入故障位置"/> -->
                 <el-select
                   v-model="form.fjposition"
@@ -173,7 +173,7 @@
                   </el-option>
                 </el-select>
                </el-form-item>
-                <el-form-item label="故障类型" :label-width="formLabelWidth">
+                <el-form-item label="故障类型" :label-width="formLabelWidth" :rules="[{ required: true, message: '请选择故障类型', trigger: 'blur' }]">
                   <!-- <el-input size="small" v-model="form.fault_type" @change="changeSelect" laceholder="请输入故障类型"/> -->
                 <el-select
                   v-model="form.fault_type"
@@ -198,7 +198,7 @@
                               <el-input v-model="form.label" />
                             </el-form-item> -->
              
-              <el-form-item label="故障等级" :label-width="formLabelWidth">
+              <el-form-item label="故障等级" :label-width="formLabelWidth" :rules="[{ required: true, message: '请选择故障等级', trigger: 'blur' }]">
                 <!-- <el-input v-model="form.fault_level" size="small"  /> -->
                 <el-select v-model="form.fault_level" filterable allow-create default-first-option @change="changeSelect">
                   <el-option
@@ -209,7 +209,7 @@
                   ></el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item label="处理建议" :label-width="formLabelWidth">
+              <!-- <el-form-item label="处理建议" :label-width="formLabelWidth">
                 <el-input
                   v-model="form.handling_suggestions"
                   type="textarea"
@@ -217,7 +217,7 @@
                   size="small"
                   @change="changeSelect"
                 />
-              </el-form-item>
+              </el-form-item> -->
               <el-form-item label="故障数量" :label-width="formLabelWidth">
                 <el-input size="small" :value="formArr.length" readonly />
               </el-form-item>
@@ -404,6 +404,7 @@ export default {
       rleData: [], // 最终图像标记
       curMode: 1, // 当前图形类型
       curtext: "",
+      lineArray: [],
       options: [
         {
           value: '同塔双回',
@@ -708,7 +709,9 @@ export default {
       // this.initimgDB();
     },
     async getErrorType(type) {
-   
+      let that = this
+      let data1 = await that.$db.faultTypeArray.toArray()
+      let data2 = await that.$db.lineTypeArray.toArray()
           let data = [
             {
               category_fault: '绝缘子',
@@ -1100,6 +1103,37 @@ export default {
               fault_type: '通道存在异物',
             },
           ]
+          if(data1.length>0){
+            data = data1
+          }
+          if(data2.length>0){
+            let result = [];
+            let categoryMap = {};
+            data2.sort((a, b) => {
+              return b.id - a.id ;
+            });
+            for (let item of data2) {
+              let category = item.category_fault;
+              if (!categoryMap[category]) {
+                categoryMap[category] = {
+                  value: category,
+                  label: category,
+                  children: []
+                };
+                result.push(categoryMap[category]);
+              }
+              categoryMap[category].children.push({
+                value: item.value,
+                label: item.label,
+                id: item.id
+              });
+            }
+            console.log(result,66666)
+            that.lineArray = result
+          }else{
+            that.lineArray = that.options
+            console.log(that.lineArray,777777)
+          }
           let list = []
           let arr = data
             console.log(type,11111)

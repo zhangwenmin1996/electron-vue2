@@ -39,7 +39,9 @@
                 </el-select> -->
             </el-form-item>
             <el-form-item label="巡检回路" prop="loopName" :rules="[{ required: true, message: '请选择巡检回路', trigger: 'blur' }]">
-                <el-input v-model="editForm.loopName" clearable size="small"></el-input>
+                <el-input v-model="editForm.loopName" placeholder="巡检回路（必填）"  clearable size="small"></el-input>
+                <br/>
+                <span style="color: #999;font-size: 12px;">如：35kV 集电一线</span>
                 <!-- <el-select v-model="editForm.loopName" placeholder="请选择巡检回路" @change="changeLoop" filterable clearable size="small" style="width:100%">
                     <el-option
                         v-for="(item,index) in loopList"
@@ -49,7 +51,7 @@
                     />
                 </el-select> -->
             </el-form-item>
-            <el-form-item label="巡检杆塔" >
+            <el-form-item label="巡检杆塔"  prop="start" :rules="[{ required: true, message: '请填写巡检杆塔号', trigger: 'blur' }]" >
                 <el-input v-model="editForm.prefix" placeholder="杆塔前缀（可不填）" clearable size="small" style="width:46%"></el-input>
                 <el-input v-model="editForm.suffix" placeholder="杆塔后缀（可不填）" clearable size="small" style="width:46%;margin-left: 2%;"></el-input>
                 <br/>

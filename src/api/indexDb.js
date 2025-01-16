@@ -1,7 +1,7 @@
 import Dexie from 'dexie';
 
 export const db = new Dexie('myDatabase'); //数据库名称：myDatabase
-db.version(1.10).stores({
+db.version(1.16).stores({
     planList: 'planCode,id,docxUrl,btnLoading,baseCode,baseCodeName,baseType,companyCode,companyName,createCode,endTime,inspectionDeviceName,inspectionScene,inspectionSceneName,isDock,planArea,planAreaName,planName,planStatus,planStatusName,planType,planTypeName,planWay,planWayName,responsibleCode,responsibleName,simpleName,startTime,updateCode,updateTime',
     dataList: '++id,accuracy,isSync,localStatus,analyType,area,auditCode,auditName,baseCode,baseCodeName,baseType,companyCode,companyName,createTime,inspectionDeviceName,inspectionScene,loopName,mapStatusName,picRenameModelId,planArea,planAreaName,planCode,planSourceType,planType,renameModelType,responsibleCode,responsibleName,simpleName,solar,status,statusName,subarray,taskPlanCode,taskPlanName,tower,updateTime,useTime,wind', // Primary key and indexed props 对象仓库（objectStore）：friends，唯一的id作为键路径（key path）
     imgList: 'fileName, taskPlanCode, planArea, name, imgUrl, showName,isSync,picIndex',
@@ -10,7 +10,8 @@ db.version(1.10).stores({
     typeList: '++id, bucket_name, c_time, category_code, category_fault, category_name, fault_info, fault_level, fault_type, fault_type_code, handling_cycle, handling_suggestions, level, original_type, u_time',
     markList: 'file_link, fault_list,img_position, file_name, minio_bucket_line, show_name, station_id, task_id, zone_id',
     faultList: 'fileName,targetPath,zoneId,taskId,stationId,faultList,showName,isSync',
-    // dataList: '',
+    lineTypeArray: '++id,value,label,category_fault',
+    faultTypeArray: '++id,value,fault_type,category_fault',
     // ruleList: '',
     // typeList: '',
     // markList: '',

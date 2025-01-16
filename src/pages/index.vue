@@ -61,6 +61,7 @@
               <el-button type="primary" icon="el-icon-plus" size="small" @click="showEdit(0)">新增计划</el-button>
               <!-- <el-button type="primary" icon="el-icon-refresh" size="small" @click="syncData">拉取数据</el-button> -->
               <el-button type="primary" icon="el-icon-delete" size="small" @click="delData">清空数据</el-button>
+              <el-button type="primary" icon="el-icon-setting" size="small" @click="isShowDict = true">配置修改</el-button>
               <!-- <el-button type="primary" icon="el-icon-plus" size="small" @click="showEdit(0)">批量上传计划</el-button> -->
               <!-- <el-button type="primary" icon="el-icon-refresh" size="small" @click="syncTaskData">同步列表</el-button>
               <el-button type="primary" icon="el-icon-refresh" size="small" @click="syncLineData">同步故障</el-button>
@@ -257,6 +258,19 @@
     </el-dialog>
     <el-dialog
       :close-on-click-modal="false"
+      title="配置修改"
+      :visible.sync="isShowDict"
+      v-if="isShowDict"
+      center
+      custom-class="box-dialog"
+      :modal-append-to-body="false"
+      top="20px"
+      width="1000px"
+    >
+      <dict-list></dict-list>
+    </el-dialog>
+    <el-dialog
+      :close-on-click-modal="false"
       title="新增任务"
       :visible.sync="isShowTask"
       v-if="isShowTask"
@@ -303,6 +317,7 @@ const iconv = require('iconv-lite');
 const { exec } = require('child_process');
 import { getUUID } from "@/api/utils";
 import lineImage from "./line";
+import dictList from "./dictList";
 import lineEdit from "./line-edit";
 import AilabelAddOrUpdate from "./ailabelAddOrUpdate";
 import { uploadMinIo, getBase64 } from "@/api/utils";
@@ -318,6 +333,7 @@ export default {
     lineImage,
     lineArr,
     lineEdit,
+    dictList
   },
   data() {
     return {
@@ -328,6 +344,7 @@ export default {
         name: '',
         planStatusName: '',
       },
+      isShowDict: false,
       currentPage: 1, // 当前页码
       pageSize: 10, // 每页的数据条数
       currentPage2: 1, // 当前页码
@@ -540,9 +557,12 @@ export default {
 
       console.log('文件夹:',process.env.NODE_ENV,publicExePath,publicDocxPath);
      setTimeout(() => {
-      arr.sort((a, b) => {
-          return a.planAreaName.localeCompare(b.planAreaName);
-      });
+      // arr.sort((a, b) => {
+      //   const numA = parseInt(a.planAreaName.match(/\d+/)[0], 10);
+      //   const numB = parseInt(b.planAreaName.match(/\d+/)[0], 10);
+      //   return numA - numB; // 按数值从小到大排序
+      // });
+      console.log(arr,33333)
       data.taskList = arr
 
         const jsonData = JSON.stringify(data, null, 2);
@@ -567,7 +587,7 @@ export default {
       that.$message.success('报告正在生成，请稍等...')
       exec(cmd, (error, stdout, stderr) => {
         if (error) {
-          console.error('执行命令出错:', error, stdout, stderr);
+          console.error('执行命令出错:',error );
           that.$set(row,'btnLoading',false)
           that.$alert(`报告生成出错:${error.toString('utf8')}`)
           return;
@@ -978,7 +998,8 @@ export default {
       this.isEdit = isEdit;
       this.isShowEdit = true;
       this.dataForm = {
-        companyName: '中广核新能源湖北分公司'
+        companyName: '中广核新能源湖北分公司',
+        suffix: '号'
       };
     },
     editOk() {
