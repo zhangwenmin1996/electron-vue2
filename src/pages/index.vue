@@ -930,6 +930,7 @@ export default {
         baseCodeName: row.baseCodeName,
         planCode: row.planCode,
         planName: row.planName,
+        suffix: '号杆塔'
       };
     },
     editSubmit(){
@@ -999,7 +1000,7 @@ export default {
       this.isShowEdit = true;
       this.dataForm = {
         companyName: '中广核新能源湖北分公司',
-        suffix: '号'
+        suffix: '号杆塔'
       };
     },
     editOk() {

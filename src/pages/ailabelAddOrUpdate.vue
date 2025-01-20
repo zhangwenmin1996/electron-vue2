@@ -2591,6 +2591,14 @@ export default {
         imgSrc.naturalHeight,
         imgHeight
       );
+      if (this.formArr.length<1&&this.isnext=='next') {
+          this.nextImg();
+          return false;
+        }
+        if (this.formArr.length<1&&this.isnext=='prev'){
+         this.prevImg();
+         return false;
+       }
       if (this.formArr.length<1&&this.isnext!='del') {
           that.$message.warning("请标注故障!");
           return false;
