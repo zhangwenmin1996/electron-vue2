@@ -579,10 +579,13 @@ export default {
       console.log(data,3333)
       const exeUrl =  publicExePath.toString()
       const docxUrl = publicDocxPath
-      const docxPathUrl = path.join(that.docxList, `${data.simpleName}${data.loopName}无人机输电线路巡检报告_${that.parseTime(new Date().getTime(),'{y}{m}{d}{h}{i}{s}')}.docx`);
+      let name = `${data.simpleName}${data.loopName}`
+      name = name.replace(/\s/g, '_');
+      const docxPathUrl = path.join(that.docxList, `${name}无人机输电线路巡检报告_${that.parseTime(new Date().getTime(),'{y}{m}{d}{h}{i}{s}')}.docx`);
+     
       // const docxPathUrl = path.join(that.docxList, `${data.simpleName}${data.loopName}无人机输电线路巡检报告.docx`);
       // const cmd = `E:\\web\\electron-vue2\\dist\\main.exe ${filePath} E:\\docxList E:\\web\\electron-vue2\\dist\\template_line_m30t.docx`;
-      const cmd = `"${exeUrl}" ${filePath} ${docxPathUrl} ${docxUrl}`;
+      const cmd = `"${exeUrl}" "${filePath}" "${docxPathUrl}" ${docxUrl}`;
       console.log(cmd,333)
       that.$message.success('报告正在生成，请稍等...')
       exec(cmd, (error, stdout, stderr) => {
