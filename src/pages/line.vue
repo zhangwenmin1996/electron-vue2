@@ -388,7 +388,7 @@ export default {
       let arr2 = file["relativePath"].split("/");
       let arr1 = arr2[arr2.length - 2];
       let folder_name = arr1.split("-")[1];
-      const hasZorV = arr.some(item => item === "Z" ||  item === "V");
+      const hasZorV = arr.some(item => item === "Z" ||  item === "V" ||  item === "T" ||  item === "W");
       console.log(hasZorV,12121)
       if (hasZorV) {
           file.pause();

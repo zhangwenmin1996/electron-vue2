@@ -336,7 +336,7 @@ export default {
       console.log(arr2,111111)
       var  folder_name = arr2[0]+'/'+parseInt(arr2[1].match(/\d+/)[0], 10)
        let name = file.name.replace(/#/g, "")
-       const hasZorV = arr.some(item => item === "Z" ||  item === "V");
+       const hasZorV = arr.some(item => item === "Z" ||  item === "V" ||  item === "T" ||  item === "W");
       this.taskList.forEach((item,index) => {
         let taskName = item.loopName +'/'+ parseInt(item.planAreaName.match(/\d+/)[0], 10)
        
@@ -458,7 +458,7 @@ export default {
       //   this.updateData(data);
       // }
       this.visible = false;
-      that.$message.success("已上传完全部文件");
+      this.$message.success("已上传完全部文件");
       this.$emit("refresh",this.propData);
     },
     onFileError(rootFile, file, response, chunk) {
