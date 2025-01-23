@@ -330,7 +330,7 @@ export default {
       // })
       
       var nameArr = file.name.split('.')
-      let arr = nameArr.split("_");
+      let arr = nameArr[0].split("_");
       let arr2 = file["relativePath"].split("/");
       // let arr1 = arr2[arr2.length - 2];
       console.log(arr2,111111)
