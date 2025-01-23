@@ -329,18 +329,19 @@ export default {
       //     }
       // })
       
-      let arr = file.name.split("_");
+      var nameArr = file.name.split('.')
+      let arr = nameArr.split("_");
       let arr2 = file["relativePath"].split("/");
       // let arr1 = arr2[arr2.length - 2];
       console.log(arr2,111111)
       var  folder_name = arr2[0]+'/'+parseInt(arr2[1].match(/\d+/)[0], 10)
        let name = file.name.replace(/#/g, "")
-      
+       const hasZorV = arr.some(item => item === "Z" ||  item === "V");
       this.taskList.forEach((item,index) => {
         let taskName = item.loopName +'/'+ parseInt(item.planAreaName.match(/\d+/)[0], 10)
        
         let name2 = item.planArea + "/" + item.taskPlanCode + "/" + file.name;
-        if(folder_name==taskName&&item.status<=1 && (arr[arr.length - 1] != "T.JPG" && arr[arr.length - 1] != "W.JPG")){
+        if(folder_name==taskName&&item.status<=1 && hasZorV){
           item.statu = '待上传'
          
           item.fileList.push(file)
@@ -354,7 +355,7 @@ export default {
         }
       });
       
-      if (arr[arr.length - 1] == "Z.JPG" || arr[arr.length - 1] == "V.JPG" ) {
+      if (hasZorV) {
               file.pause();
             let res = this.taskList.findIndex(item=>{
                 return folder_name == item.taskName
@@ -513,12 +514,12 @@ export default {
         // let pathArr = file.relativePath.split("/")
         let pathArr = file.relativePath.split("/")
       let nameArr = file.name.split('_')
-      let picIndex = parseInt(nameArr[nameArr.length - 2]) 
+      let picIndex = parseInt(nameArr[2]) 
       // console.log(picName,11111)
       let picPath = file.name.replace(/#/g, "")
       // let showName =`${form.loopName}-${form.planAreaName}-${picName.length!=0?picName[0].picName:picPath}`
       picPath = pathArr[pathArr.length-3]+'/'+pathArr[pathArr.length-2]+'_'+
-        nameArr[nameArr.length-2]
+        nameArr[2]
       let showName =`${that.taskList[listIndex].loopName}-${that.taskList[listIndex].planAreaName}-${picPath}`
         // let nameArr = file.name.split('_')
         // let picIndex = parseInt(nameArr[nameArr.length - 2])

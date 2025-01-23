@@ -383,12 +383,14 @@ export default {
       //         ...this.propData,
       //     }
       // })
-      let arr = file.name.split("_");
+      var nameArr = file.name.split('.')
+      let arr = nameArr.split("_");
       let arr2 = file["relativePath"].split("/");
       let arr1 = arr2[arr2.length - 2];
       let folder_name = arr1.split("-")[1];
-      // console.log(folder_name,12121)
-      if (arr[arr.length - 1] == "Z.JPG") {
+      const hasZorV = arr.some(item => item === "Z" ||  item === "V");
+      console.log(hasZorV,12121)
+      if (hasZorV) {
           file.pause();
         let list = this.imgNames.includes(file.name)
         if(list){
@@ -525,12 +527,12 @@ export default {
       console.log(form, file,3333);
       let pathArr = file.relativePath.split("/")
       let nameArr = file.name.split('_')
-      let picIndex = parseInt(nameArr[nameArr.length - 2]) 
+      let picIndex = parseInt(nameArr[2]) 
       // console.log(picName,11111)
       let picPath = file.name.replace(/#/g, "")
       // let showName =`${form.loopName}-${form.planAreaName}-${picName.length!=0?picName[0].picName:picPath}`
       picPath = pathArr[pathArr.length-3]+'/'+pathArr[pathArr.length-2]+'_'+
-        nameArr[nameArr.length-2]
+        nameArr[2]
       let showName =`${form.loopName}-${form.planAreaName}-${picPath}`
       console.log(showName,999999)
      // renameList.forEach(item => {
