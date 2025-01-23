@@ -994,7 +994,6 @@ export default {
         });
         that.isShowTask = false
         that.getDataList(that.editForm)
-        console.log(planArea,areaCodes,obj,111111)       
         }
       })
     },

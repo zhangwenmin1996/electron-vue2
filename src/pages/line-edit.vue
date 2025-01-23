@@ -279,7 +279,6 @@ props:{
             that.$db.dataList.put(obj2);
         });
         that.editOk()
-        console.log(planArea,areaCodes,obj,111111)       
         }
       })
     },
