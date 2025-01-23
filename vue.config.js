@@ -30,7 +30,7 @@ module.exports = defineConfig({
             customFileProtocol: "./",
             builderOptions: {
                 "appId": "com.xunjianApp", // 程序的包ID
-                "productName": "智能运维系统",
+                "productName": "智能运维系统V1.23",
                 "copyright": "Copyright © 2024",
                 "directories": {
                     "output": "./dist" //输出文件路径

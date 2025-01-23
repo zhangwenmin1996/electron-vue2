@@ -16,7 +16,7 @@ async function createWindow() {
     const win = new BrowserWindow({
         width: 1440,
         height: 800,
-        title: '智能运维系统',
+        title: '智能运维系统V1.23',
         autoHideMenuBar: true,
         webPreferences: {
             webSecurity: false,
